@@ -1,0 +1,19 @@
+fint:
+  kafka:
+    topic:
+      org-id: fintlabs.no
+      domain-context: flyt
+    application-id: fint-flyt-acos-instance-gateway
+spring:
+  kafka:
+    bootstrap-servers: localhost:29092
+    consumer:
+      group-id: fint-flyt-acos-instance-gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://idp.felleskomponent.no/nidp/oauth/nam
+server:
+  port: 8080
+  max-http-header-size: 40KB

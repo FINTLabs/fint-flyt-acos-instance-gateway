@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "fint.org-id",
+      "type": "java.lang.String",
+      "description": "Description for fint.org-id."
+  }
+] }
