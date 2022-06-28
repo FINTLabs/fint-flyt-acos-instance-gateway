@@ -36,7 +36,7 @@ spec:
     - host: "viken-no-skjema.vigoiks.no"
       http:
         paths:
-          - path: /api/sak/info
+          - path: /api/instans/acos
             pathType: Prefix
             backend:
               service:
@@ -76,10 +76,10 @@ spec:
               mountPath: /credentials
           resources:
             limits:
-              memory: "512Mi"
+              memory: "2048Mi"
               cpu: "1"
             requests:
-              memory: "128Mi"
+              memory: "512Mi"
               cpu: "100m"
           ports:
             - containerPort: 8080
