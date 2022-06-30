@@ -5,10 +5,12 @@ import no.fintlabs.model.acos.AcosInstance;
 import no.fintlabs.model.acos.AcosInstanceElement;
 import no.fintlabs.model.fint.Document;
 import no.fintlabs.model.fint.Instance;
+import no.fintlabs.model.fint.InstanceField;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,17 +20,23 @@ public class AcosInstanceMapper {
         return Instance
                 .builder()
                 .sourceApplicationInstanceUri(acosInstance.getMetadata().getInstanceUri())
-                .fieldValuePerId(toFieldValuePerId(acosInstance.getElements()))
+                .fieldPerId(toFieldPerId(acosInstance.getElements()))
                 .documents(toDocuments(acosInstance.getDocuments()))
                 .build();
     }
 
-    private Map<String, String> toFieldValuePerId(List<AcosInstanceElement> acosInstanceElements) {
+    private Map<String, InstanceField> toFieldPerId(List<AcosInstanceElement> acosInstanceElements) {
         return acosInstanceElements
                 .stream()
+                .map(acosInstanceElement -> InstanceField
+                        .builder()
+                        .id(acosInstanceElement.getId())
+                        .value(acosInstanceElement.getValue())
+                        .build()
+                )
                 .collect(Collectors.toMap(
-                        AcosInstanceElement::getId,
-                        AcosInstanceElement::getValue
+                        InstanceField::getId,
+                        Function.identity()
                 ));
     }
 

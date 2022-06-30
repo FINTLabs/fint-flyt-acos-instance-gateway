@@ -6,6 +6,7 @@ import no.fintlabs.model.acos.AcosInstanceElement
 import no.fintlabs.model.acos.AcosInstanceMetadata
 import no.fintlabs.model.fint.Document
 import no.fintlabs.model.fint.Instance
+import no.fintlabs.model.fint.InstanceField
 import spock.lang.Specification
 
 class InstanceMapperSpec extends Specification {
@@ -44,13 +45,13 @@ class InstanceMapperSpec extends Specification {
         expectedInstance = Instance
                 .builder()
                 .sourceApplicationInstanceUri("https://acos.com/form-instance?id=100384")
-                .fieldValuePerId(Map.of(
-                        "Fornavn", "Ola",
-                        "Etternavn", "Nordmann",
-                        "Fornavn2", "Kari",
-                        "Etternavn2", "Ødegård",
-                        "Ukedag", "Tirsdag",
-                        "Farge_pa_bil", "Grønn",
+                .fieldPerId(Map.of(
+                        "Fornavn", InstanceField.builder().id("Fornavn").value("Ola").build(),
+                        "Etternavn", InstanceField.builder().id("Etternavn").value("Nordmann").build(),
+                        "Fornavn2", InstanceField.builder().id("Fornavn2").value("Kari").build(),
+                        "Etternavn2", InstanceField.builder().id("Etternavn2").value("Ødegård").build(),
+                        "Ukedag", InstanceField.builder().id("Ukedag").value("Tirsdag").build(),
+                        "Farge_pa_bil", InstanceField.builder().id("Farge_pa_bil").value("Grønn").build(),
                 ))
                 .documents(List.of(
                         Document

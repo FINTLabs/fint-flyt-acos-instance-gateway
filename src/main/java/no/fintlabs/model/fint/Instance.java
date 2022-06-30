@@ -14,6 +14,6 @@ import java.util.Map;
 @NoArgsConstructor
 public class Instance {
     private String sourceApplicationInstanceUri;
-    private Map<String, String> fieldValuePerId;
+    private Map<String, InstanceField> fieldPerId;
     private List<Document> documents;
 }
