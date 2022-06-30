@@ -23,7 +23,7 @@ public class InstanceProducerService {
         this.formDefinitionEventTopicNameParameters = EventTopicNameParameters.builder()
                 .eventName("incoming-instance")
                 .build();
-        eventTopicService.ensureTopic(formDefinitionEventTopicNameParameters, 0);
+        eventTopicService.ensureTopic(formDefinitionEventTopicNameParameters, 15778463000L);
     }
 
     public void publishNewIntegrationMetadata(Object instance) {
