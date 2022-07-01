@@ -16,4 +16,6 @@ spring:
         jwt:
           issuer-uri: https://idp.felleskomponent.no/nidp/oauth/nam
 server:
+  error:
+    include-message: always
   port: 8080

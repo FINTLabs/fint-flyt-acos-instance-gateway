@@ -1,6 +1,5 @@
 package no.fintlabs;
 
-import no.fintlabs.model.AcosInstanceValidator;
 import no.fintlabs.model.acos.AcosInstance;
 import no.fintlabs.model.fint.Instance;
 import org.springframework.http.HttpStatus;
@@ -10,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/instans/acos")
@@ -32,8 +33,11 @@ public class AcosInstanceController {
     @PostMapping()
     public ResponseEntity<?> postInstance(@RequestBody AcosInstance acosInstance) {
         acosInstanceValidator.validate(acosInstance).ifPresent(
-                (AcosInstanceValidator.Error error) -> {
-                    throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Validation error: " + error);
+                (List<String> validationErrors) -> {
+                    throw new ResponseStatusException(
+                            HttpStatus.UNPROCESSABLE_ENTITY, "Validation error(s): "
+                            + validationErrors.stream().map(error -> "'" + error + "'").toList()
+                    );
                 }
         );
         Instance instance = acosInstanceMapper.toInstance(acosInstance);
