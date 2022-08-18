@@ -1,5 +1,12 @@
 fint:
   org-id: fintlabs.no
+  flyt:
+    security:
+      api:
+        external:
+          authorized-client-id: 1
+        internal:
+          authorized-org-id: viken.no
   kafka:
     topic:
       org-id: ${fint.org-id}

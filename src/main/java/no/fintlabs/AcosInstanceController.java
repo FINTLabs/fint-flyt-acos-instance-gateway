@@ -2,13 +2,17 @@ package no.fintlabs;
 
 import no.fintlabs.model.acos.AcosInstance;
 import no.fintlabs.model.fint.Instance;
+import no.fintlabs.security.client.ClientAuthorizationUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -31,7 +35,13 @@ public class AcosInstanceController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> postInstance(@RequestBody AcosInstance acosInstance) {
+    public Mono<ResponseEntity<?>> postInstance(
+            @RequestBody AcosInstance acosInstance,
+            @AuthenticationPrincipal Mono<Authentication> authenticationMono) {
+        return authenticationMono.map(authentication -> processInstance(acosInstance, authentication));
+    }
+
+    private ResponseEntity<?> processInstance(AcosInstance acosInstance, Authentication authentication) {
         acosInstanceValidator.validate(acosInstance).ifPresent(
                 (List<String> validationErrors) -> {
                     throw new ResponseStatusException(
@@ -41,7 +51,13 @@ public class AcosInstanceController {
                 }
         );
         Instance instance = acosInstanceMapper.toInstance(acosInstance);
-        instanceProducerService.publishNewIntegrationMetadata(instance);
+
+        instanceProducerService.publishIncomingInstance(
+                ClientAuthorizationUtil.getSourceApplicationId(authentication),
+                acosInstance.getMetadata().getFormId(),
+                acosInstance.getMetadata().getInstanceId(),
+                instance
+        );
         return ResponseEntity.accepted().build();
     }
 
