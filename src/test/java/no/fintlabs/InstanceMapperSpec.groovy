@@ -45,13 +45,13 @@ class InstanceMapperSpec extends Specification {
         expectedInstance = Instance
                 .builder()
                 .sourceApplicationInstanceUri("https://acos.com/form-instance?id=100384")
-                .fieldPerId(Map.of(
-                        "Fornavn", InstanceField.builder().id("Fornavn").value("Ola").build(),
-                        "Etternavn", InstanceField.builder().id("Etternavn").value("Nordmann").build(),
-                        "Fornavn2", InstanceField.builder().id("Fornavn2").value("Kari").build(),
-                        "Etternavn2", InstanceField.builder().id("Etternavn2").value("Ødegård").build(),
-                        "Ukedag", InstanceField.builder().id("Ukedag").value("Tirsdag").build(),
-                        "Farge_pa_bil", InstanceField.builder().id("Farge_pa_bil").value("Grønn").build(),
+                .fieldPerKey(Map.of(
+                        "Fornavn", InstanceField.builder().key("Fornavn").value("Ola").build(),
+                        "Etternavn", InstanceField.builder().key("Etternavn").value("Nordmann").build(),
+                        "Fornavn2", InstanceField.builder().key("Fornavn2").value("Kari").build(),
+                        "Etternavn2", InstanceField.builder().key("Etternavn2").value("Ødegård").build(),
+                        "Ukedag", InstanceField.builder().key("Ukedag").value("Tirsdag").build(),
+                        "Farge_pa_bil", InstanceField.builder().key("Farge_pa_bil").value("Grønn").build(),
                 ))
                 .documents(List.of(
                         Document

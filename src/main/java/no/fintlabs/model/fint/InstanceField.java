@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InstanceField {
-    private String id;
+    private String key;
     private String value;
 }
