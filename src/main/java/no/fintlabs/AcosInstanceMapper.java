@@ -20,22 +20,22 @@ public class AcosInstanceMapper {
         return Instance
                 .builder()
                 .sourceApplicationInstanceUri(acosInstance.getMetadata().getInstanceUri())
-                .fieldPerId(toFieldPerId(acosInstance.getElements()))
+                .fieldPerKey(toFieldPerKey(acosInstance.getElements()))
                 .documents(toDocuments(acosInstance.getDocuments()))
                 .build();
     }
 
-    private Map<String, InstanceField> toFieldPerId(List<AcosInstanceElement> acosInstanceElements) {
+    private Map<String, InstanceField> toFieldPerKey(List<AcosInstanceElement> acosInstanceElements) {
         return acosInstanceElements
                 .stream()
                 .map(acosInstanceElement -> InstanceField
                         .builder()
-                        .id(acosInstanceElement.getId())
+                        .key(acosInstanceElement.getId())
                         .value(acosInstanceElement.getValue())
                         .build()
                 )
                 .collect(Collectors.toMap(
-                        InstanceField::getId,
+                        InstanceField::getKey,
                         Function.identity()
                 ));
     }

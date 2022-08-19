@@ -84,3 +84,5 @@ spec:
             - { name: TZ, value: Europe/Oslo }
             - { name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx480M' }
             - { name: fint.org-id, value: 'viken.no' }
+            - { name: fint.flyt.security.api.internal.authorized-org-id, value: 'viken.no' }
+            - { name: fint.flyt.security.api.external.authorized-client-id, value: '1' }
