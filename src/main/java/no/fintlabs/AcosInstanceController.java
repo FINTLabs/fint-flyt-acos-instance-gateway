@@ -2,7 +2,7 @@ package no.fintlabs;
 
 import no.fintlabs.model.acos.AcosInstance;
 import no.fintlabs.model.fint.Instance;
-import no.fintlabs.security.client.ClientAuthorizationUtil;
+import no.fintlabs.resourceserver.security.client.ClientAuthorizationUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,8 +16,10 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static no.fintlabs.resourceserver.UrlPaths.EXTERNAL_API;
+
 @RestController
-@RequestMapping("api/instans/acos")
+@RequestMapping(EXTERNAL_API + "/instans/acos")
 public class AcosInstanceController {
 
     private final AcosInstanceValidator acosInstanceValidator;
