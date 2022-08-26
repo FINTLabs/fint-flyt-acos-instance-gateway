@@ -82,7 +82,7 @@ spec:
                 name: aiven-kafka
           env:
             - { name: TZ, value: Europe/Oslo }
-            - { name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx480M' }
+            - { name: JAVA_TOOL_OPTIONS, value: '-XX:+ExitOnOutOfMemoryError -Xmx480M -verbose:gc' }
             - { name: fint.org-id, value: 'viken.no' }
-            - { name: fint.flyt.security.api.internal.authorized-org-id, value: 'viken.no' }
-            - { name: fint.flyt.security.api.external.authorized-client-id, value: '1' }
+            - { name: fint.flyt.resource-server.security.api.external.enabled, value: true }
+            - { name: fint.flyt.resource-server.security.api.external.authorized-client-ids, value: '1' }
