@@ -14,12 +14,15 @@ import javax.validation.constraints.NotBlank;
 public class AcosDocument {
 
     @NotBlank
+    private String name;
+
+    @NotBlank
     private String type;
 
-    // TODO: 01/07/2022 Add validation when ACOS has decided on document format
-    // TODO: 01/07/2022 Remove uri or base64  when ACOS has decided on document format
-    private String uri;
+    @NotBlank
+    private String encoding;
 
+    @NotBlank
     private String base64;
 
 }
