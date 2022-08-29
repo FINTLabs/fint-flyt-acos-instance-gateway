@@ -50,8 +50,9 @@ public class AcosInstanceMapper {
     private Document toDocument(AcosDocument acosDocument) {
         return Document
                 .builder()
+                .name(acosDocument.getName())
                 .type(acosDocument.getType())
-                .uri(acosDocument.getUri())
+                .encoding(acosDocument.getEncoding())
                 .base64(acosDocument.getBase64())
                 .build();
     }

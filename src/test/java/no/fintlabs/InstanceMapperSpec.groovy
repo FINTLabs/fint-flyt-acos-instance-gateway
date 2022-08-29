@@ -38,7 +38,12 @@ class InstanceMapperSpec extends Specification {
 
                 ))
                 .documents(List.of(
-                        AcosDocument.builder().type("pdfa").uri("https://acos.com/document/1234").build()
+                        AcosDocument.builder()
+                                .name("dokumentnavn")
+                                .type("pdfa")
+                                .encoding("UTF-8")
+                                .base64("base64String")
+                                .build()
                 ))
                 .build()
 
@@ -56,8 +61,10 @@ class InstanceMapperSpec extends Specification {
                 .documents(List.of(
                         Document
                                 .builder()
+                                .name("dokumentnavn")
                                 .type("pdfa")
-                                .uri("https://acos.com/document/1234")
+                                .encoding("UTF-8")
+                                .base64("base64String")
                                 .build()
                 ))
                 .build()
