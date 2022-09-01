@@ -11,46 +11,34 @@ import no.fintlabs.model.fint.Instance;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Slf4j
 @Service
-public class InstanceProducerService {
+public class ReceivedInstanceEventProducerService {
 
     @Value("${fint.org-id}")
     private String orgId;
     private final InstanceFlowEventProducer<Instance> instanceProducer;
     private final EventTopicNameParameters formDefinitionEventTopicNameParameters;
 
-    public InstanceProducerService(
+    public ReceivedInstanceEventProducerService(
             InstanceFlowEventProducerFactory instanceFlowEventProducerFactory,
             EventTopicService eventTopicService
     ) {
         this.instanceProducer = instanceFlowEventProducerFactory.createProducer(Instance.class);
         this.formDefinitionEventTopicNameParameters = EventTopicNameParameters.builder()
-                .eventName("incoming-instance")
+                .eventName("instance-received")
                 .build();
         eventTopicService.ensureTopic(formDefinitionEventTopicNameParameters, 15778463000L);
     }
 
-    public void publishIncomingInstance(
-            String sourceApplicationId,
-            String sourceApplicationIntegrationId,
-            String sourceApplicationInstanceId,
+    public void publish(
+            InstanceFlowHeaders instanceFlowHeaders,
             Instance instance
     ) {
         instanceProducer.send(
                 InstanceFlowEventProducerRecord.<Instance>builder()
                         .topicNameParameters(formDefinitionEventTopicNameParameters)
-                        .instanceFlowHeaders(InstanceFlowHeaders
-                                .builder()
-                                .orgId(orgId)
-                                .sourceApplicationId(sourceApplicationId)
-                                .sourceApplicationIntegrationId(sourceApplicationIntegrationId)
-                                .sourceApplicationInstanceId(sourceApplicationInstanceId)
-                                .correlationId(UUID.randomUUID().toString())
-                                .build()
-                        )
+                        .instanceFlowHeaders(instanceFlowHeaders)
                         .value(instance)
                         .build()
         );
