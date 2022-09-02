@@ -79,12 +79,14 @@ public class AcosInstanceController {
 
         } catch (InstanceValidationException e) {
             instanceReceivalErrorEventProducerService.publishInstanceValidationErrorEvent(instanceFlowHeadersBuilder.build(), e);
+
             throw new ResponseStatusException(
                     HttpStatus.UNPROCESSABLE_ENTITY,
-                    "Validation error(s): " + e.getValidationErrors()
-                            .stream()
-                            .map(error -> "'" + error.getFieldPath() + " " + error.getErrorMessage() + "'")
-                            .toList()
+                    "Validation error" + (e.getValidationErrors().size() > 1 ? "s:" : ": ") +
+                            e.getValidationErrors()
+                                    .stream()
+                                    .map(error -> "'" + error.getFieldPath() + " " + error.getErrorMessage() + "'")
+                                    .toList()
             );
         } catch (RuntimeException e) {
             instanceReceivalErrorEventProducerService.publishGeneralSystemErrorEvent(instanceFlowHeadersBuilder.build());
