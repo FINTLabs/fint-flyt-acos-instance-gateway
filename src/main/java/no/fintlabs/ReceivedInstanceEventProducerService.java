@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReceivedInstanceEventProducerService {
 
-    @Value("${fint.org-id}")
-    private String orgId;
     private final InstanceFlowEventProducer<Instance> instanceProducer;
     private final EventTopicNameParameters formDefinitionEventTopicNameParameters;
 
