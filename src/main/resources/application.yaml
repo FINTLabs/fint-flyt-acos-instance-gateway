@@ -1,9 +1,12 @@
 fint:
   application-id: fint-flyt-acos-instance-gateway
 server:
+  max-http-header-size: 40KB
   error:
     include-message: always
 spring:
+  codec:
+    max-in-memory-size: 100MB
   profiles:
     include:
       - flyt-kafka
