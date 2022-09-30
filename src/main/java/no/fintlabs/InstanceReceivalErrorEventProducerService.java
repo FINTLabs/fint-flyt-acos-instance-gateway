@@ -12,6 +12,8 @@ import no.fintlabs.validation.InstanceValidationErrorMappingService;
 import no.fintlabs.validation.InstanceValidationException;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Slf4j
 @Service
 public class InstanceReceivalErrorEventProducerService {
@@ -42,6 +44,27 @@ public class InstanceReceivalErrorEventProducerService {
                         .topicNameParameters(instanceProcessingErrorTopicNameParameters)
                         .instanceFlowHeaders(instanceFlowHeaders)
                         .errorCollection(instanceValidationErrorMappingService.map(e))
+                        .build()
+        );
+    }
+
+    public void publishNoIntegrationFoundErrorEvent(InstanceFlowHeaders instanceFlowHeaders, NoIntegrationException e) {
+        instanceFlowErrorEventProducer.send(
+                InstanceFlowErrorEventProducerRecord
+                        .builder()
+                        .topicNameParameters(instanceProcessingErrorTopicNameParameters)
+                        .instanceFlowHeaders(instanceFlowHeaders)
+                        .errorCollection(new ErrorCollection(Error
+                                .builder()
+                                .errorCode(ErrorCode.NO_INTEGRATION_FOUND_ERROR.getCode())
+                                .args(Map.of(
+                                        "sourceApplicationId",
+                                        String.valueOf(e.getSourceApplicationIdAndSourceApplicationIntegrationId().getSourceApplicationId()),
+                                        "sourceApplicationIntegrationId",
+                                        e.getSourceApplicationIdAndSourceApplicationIntegrationId().getSourceApplicationIntegrationId()
+                                ))
+                                .build()
+                        ))
                         .build()
         );
     }
