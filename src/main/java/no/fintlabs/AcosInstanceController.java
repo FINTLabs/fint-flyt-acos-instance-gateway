@@ -1,30 +1,35 @@
 package no.fintlabs;
 
+import no.fintlabs.caseinfo.ArchiveCaseIdRequestService;
+import no.fintlabs.caseinfo.CaseInfoMappingService;
+import no.fintlabs.caseinfo.CaseRequestService;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
 import no.fintlabs.model.SourceApplicationIdAndSourceApplicationIntegrationId;
 import no.fintlabs.model.acos.AcosInstance;
-import no.fintlabs.model.fint.Instance;
+import no.fintlabs.model.fint.instance.Instance;
+import no.fintlabs.model.fint.caseinfo.AdministrativeUnit;
+import no.fintlabs.model.fint.caseinfo.CaseInfo;
+import no.fintlabs.model.fint.caseinfo.CaseManager;
+import no.fintlabs.model.fint.caseinfo.CaseStatus;
 import no.fintlabs.resourceserver.security.client.ClientAuthorizationUtil;
 import no.fintlabs.validation.AcosInstanceValidationService;
 import no.fintlabs.validation.InstanceValidationException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static no.fintlabs.resourceserver.UrlPaths.EXTERNAL_API;
+import static no.fintlabs.resourceserver.security.client.ClientAuthorizationUtil.getSourceApplicationId;
 
 @RestController
-@RequestMapping(EXTERNAL_API + "/instans/acos")
+@RequestMapping(EXTERNAL_API + "/acos/instanser")
 public class AcosInstanceController {
 
     private final AcosInstanceValidationService acosInstanceValidationService;
@@ -32,21 +37,96 @@ public class AcosInstanceController {
     private final ReceivedInstanceEventProducerService receivedInstanceEventProducerService;
     private final InstanceReceivalErrorEventProducerService instanceReceivalErrorEventProducerService;
     private final IntegrationIdRequestProducerService integrationIdRequestProducerService;
+    private final ArchiveCaseIdRequestService archiveCaseIdRequestService;
+    private final CaseRequestService caseRequestService;
+    private final CaseInfoMappingService caseInfoMappingService;
 
     public AcosInstanceController(
             AcosInstanceValidationService acosInstanceValidationService,
             AcosInstanceMapper acosInstanceMapper,
             ReceivedInstanceEventProducerService receivedInstanceEventProducerService,
             InstanceReceivalErrorEventProducerService instanceReceivalErrorEventProducerService,
-            IntegrationIdRequestProducerService integrationIdRequestProducerService) {
+            IntegrationIdRequestProducerService integrationIdRequestProducerService,
+            ArchiveCaseIdRequestService archiveCaseIdRequestService,
+            CaseRequestService caseRequestService,
+            CaseInfoMappingService caseInfoMappingService
+    ) {
         this.acosInstanceValidationService = acosInstanceValidationService;
         this.acosInstanceMapper = acosInstanceMapper;
         this.receivedInstanceEventProducerService = receivedInstanceEventProducerService;
         this.instanceReceivalErrorEventProducerService = instanceReceivalErrorEventProducerService;
         this.integrationIdRequestProducerService = integrationIdRequestProducerService;
+        this.archiveCaseIdRequestService = archiveCaseIdRequestService;
+        this.caseRequestService = caseRequestService;
+        this.caseInfoMappingService = caseInfoMappingService;
     }
 
-    @PostMapping()
+    @GetMapping("{sourceApplicationInstanceId}/saksinformasjon")
+    public Mono<ResponseEntity<CaseInfo>> getInstanceCaseInfo(
+            @AuthenticationPrincipal Mono<Authentication> authenticationMono,
+            @PathVariable String sourceApplicationInstanceId,
+            @RequestParam Optional<Boolean> returnMockData
+    ) {
+        return authenticationMono.map(authentication -> getCaseInfo(
+                authentication,
+                sourceApplicationInstanceId,
+                returnMockData.orElse(false)
+        ));
+    }
+
+    public ResponseEntity<CaseInfo> getCaseInfo(
+            Authentication authentication,
+            String sourceApplicationInstanceId,
+            boolean returnMockData
+    ) {
+        if (returnMockData) {
+            return ResponseEntity.ok(createMockCaseInfo(sourceApplicationInstanceId));
+        }
+        return archiveCaseIdRequestService.getArchiveCaseId(
+                        getSourceApplicationId(authentication),
+                        sourceApplicationInstanceId
+                )
+                .flatMap(caseRequestService::getByArchiveCaseId)
+                .map(caseResource -> caseInfoMappingService.toCaseInfo(sourceApplicationInstanceId, caseResource))
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        String.format("Case with sourceApplicationInstanceId=%s could not be found", sourceApplicationInstanceId)
+                ));
+    }
+
+    private CaseInfo createMockCaseInfo(String sourceApplicationInstanceId) {
+        return CaseInfo
+                .builder()
+                .sourceApplicationInstanceId(sourceApplicationInstanceId)
+                .archiveCaseId("2021/02")
+                .caseManager(
+                        CaseManager
+                                .builder()
+                                .firstName("Ola")
+                                .middleName(null)
+                                .lastName("Nordmann")
+                                .email("ola.normann@domain.com")
+                                .phone("12345678")
+                                .build()
+                )
+                .administrativeUnit(
+                        AdministrativeUnit
+                                .builder()
+                                .name("VGGLEM Skolemiljø og Kommunikasjon")
+                                .build()
+                )
+                .status(
+                        CaseStatus
+                                .builder()
+                                .name("Under behandling")
+                                .code("B")
+                                .build()
+                )
+                .build();
+    }
+
+    @PostMapping
     public Mono<ResponseEntity<?>> postInstance(
             @RequestBody AcosInstance acosInstance,
             @AuthenticationPrincipal Mono<Authentication> authenticationMono) {

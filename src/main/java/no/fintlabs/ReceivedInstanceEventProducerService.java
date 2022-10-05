@@ -7,8 +7,7 @@ import no.fintlabs.flyt.kafka.event.InstanceFlowEventProducerRecord;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
 import no.fintlabs.kafka.event.topic.EventTopicNameParameters;
 import no.fintlabs.kafka.event.topic.EventTopicService;
-import no.fintlabs.model.fint.Instance;
-import org.springframework.beans.factory.annotation.Value;
+import no.fintlabs.model.fint.instance.Instance;
 import org.springframework.stereotype.Service;
 
 @Slf4j
