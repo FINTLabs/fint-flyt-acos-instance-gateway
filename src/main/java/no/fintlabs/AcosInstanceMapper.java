@@ -3,9 +3,9 @@ package no.fintlabs;
 import no.fintlabs.model.acos.AcosDocument;
 import no.fintlabs.model.acos.AcosInstance;
 import no.fintlabs.model.acos.AcosInstanceElement;
-import no.fintlabs.model.fint.Document;
-import no.fintlabs.model.fint.Instance;
-import no.fintlabs.model.fint.InstanceField;
+import no.fintlabs.model.fint.instance.Document;
+import no.fintlabs.model.fint.instance.Instance;
+import no.fintlabs.model.fint.instance.InstanceField;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
