@@ -141,7 +141,7 @@ public class AcosInstanceController {
         try {
             Long sourceApplicationId = ClientAuthorizationUtil.getSourceApplicationId(authentication);
 
-            instanceFlowHeadersBuilder.correlationId(UUID.randomUUID().toString());
+            instanceFlowHeadersBuilder.correlationId(UUID.randomUUID());
             instanceFlowHeadersBuilder.sourceApplicationId(sourceApplicationId);
             if (acosInstance.getMetadata() != null) {
 
