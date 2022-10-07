@@ -29,14 +29,14 @@ public class ArchiveCaseIdRequestService {
     ) {
         requestTopicNameParameters = RequestTopicNameParameters
                 .builder()
-                .resource("archive.case.id")
+                .resource("archive.instance.id")
                 .parameterName("source-application-instance-id")
                 .build();
 
         ReplyTopicNameParameters replyTopicNameParameters = ReplyTopicNameParameters
                 .builder()
                 .applicationId(applicationId)
-                .resource("archive.case.id")
+                .resource("archive.instance.id")
                 .build();
 
         replyTopicService.ensureTopic(replyTopicNameParameters, 0, TopicCleanupPolicyParameters.builder().build());
