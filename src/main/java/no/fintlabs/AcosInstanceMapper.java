@@ -53,7 +53,7 @@ public class AcosInstanceMapper {
                 .name(acosDocument.getName())
                 .type(acosDocument.getType())
                 .encoding(acosDocument.getEncoding())
-                .base64(acosDocument.getBase64())
+//                .base64(acosDocument.getBase64())
                 .build();
     }
 
