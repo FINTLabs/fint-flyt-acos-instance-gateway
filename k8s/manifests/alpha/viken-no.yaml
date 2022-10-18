@@ -18,25 +18,21 @@ spec:
   selector:
     io.kompose.service: fint-flyt-acos-instance-gateway
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
 metadata:
-  name: ingress-fint-flyt-acos-instance-gateway
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  name: fint-flyt-acos-instance-gateway
+  labels:
+    app: fint-flyt-acos-instance-gateway
 spec:
-  rules:
-    - host: "viken-no-skjema.vigoiks.no"
-      http:
-        paths:
-          - path: /api/acos/instanser
-            pathType: Prefix
-            backend:
-              service:
-                name: fint-flyt-acos-instance-gateway
-                port:
-                  number: 8080
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`viken-no-skjema.vigoiks.no`) && PathPrefix(`/api/acos/instanser`)
+      kind: Rule
+      services:
+        - name: fint-flyt-acos-instance-gateway
+          port: 8080
 ---
 apiVersion: apps/v1
 kind: Deployment
