@@ -1,6 +1,8 @@
-package no.fintlabs;
+package no.fintlabs.kafka;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fintlabs.ErrorCode;
+import no.fintlabs.NoIntegrationException;
 import no.fintlabs.flyt.kafka.event.error.InstanceFlowErrorEventProducer;
 import no.fintlabs.flyt.kafka.event.error.InstanceFlowErrorEventProducerRecord;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;

@@ -1,4 +1,4 @@
-package no.fintlabs.caseinfo;
+package no.fintlabs.kafka;
 
 import no.fintlabs.kafka.common.topic.TopicCleanupPolicyParameters;
 import no.fintlabs.kafka.requestreply.RequestProducer;

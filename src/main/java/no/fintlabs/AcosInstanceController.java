@@ -1,16 +1,16 @@
 package no.fintlabs;
 
-import no.fintlabs.caseinfo.ArchiveCaseIdRequestService;
 import no.fintlabs.caseinfo.CaseInfoMappingService;
-import no.fintlabs.caseinfo.CaseRequestService;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
+import no.fintlabs.kafka.*;
 import no.fintlabs.model.SourceApplicationIdAndSourceApplicationIntegrationId;
 import no.fintlabs.model.acos.AcosInstance;
-import no.fintlabs.model.fint.instance.Instance;
+import no.fintlabs.model.fint.Integration;
 import no.fintlabs.model.fint.caseinfo.AdministrativeUnit;
 import no.fintlabs.model.fint.caseinfo.CaseInfo;
 import no.fintlabs.model.fint.caseinfo.CaseManager;
 import no.fintlabs.model.fint.caseinfo.CaseStatus;
+import no.fintlabs.model.fint.instance.Instance;
 import no.fintlabs.resourceserver.security.client.ClientAuthorizationUtil;
 import no.fintlabs.validation.AcosInstanceValidationService;
 import no.fintlabs.validation.InstanceValidationException;
@@ -36,9 +36,9 @@ public class AcosInstanceController {
     private final AcosInstanceMapper acosInstanceMapper;
     private final ReceivedInstanceEventProducerService receivedInstanceEventProducerService;
     private final InstanceReceivalErrorEventProducerService instanceReceivalErrorEventProducerService;
-    private final IntegrationIdRequestProducerService integrationIdRequestProducerService;
+    private final IntegrationRequestProducerService integrationRequestProducerService;
     private final ArchiveCaseIdRequestService archiveCaseIdRequestService;
-    private final CaseRequestService caseRequestService;
+    private final ArchiveCaseRequestService archiveCaseRequestService;
     private final CaseInfoMappingService caseInfoMappingService;
 
     public AcosInstanceController(
@@ -46,18 +46,18 @@ public class AcosInstanceController {
             AcosInstanceMapper acosInstanceMapper,
             ReceivedInstanceEventProducerService receivedInstanceEventProducerService,
             InstanceReceivalErrorEventProducerService instanceReceivalErrorEventProducerService,
-            IntegrationIdRequestProducerService integrationIdRequestProducerService,
+            IntegrationRequestProducerService integrationRequestProducerService,
             ArchiveCaseIdRequestService archiveCaseIdRequestService,
-            CaseRequestService caseRequestService,
+            ArchiveCaseRequestService archiveCaseRequestService,
             CaseInfoMappingService caseInfoMappingService
     ) {
         this.acosInstanceValidationService = acosInstanceValidationService;
         this.acosInstanceMapper = acosInstanceMapper;
         this.receivedInstanceEventProducerService = receivedInstanceEventProducerService;
         this.instanceReceivalErrorEventProducerService = instanceReceivalErrorEventProducerService;
-        this.integrationIdRequestProducerService = integrationIdRequestProducerService;
+        this.integrationRequestProducerService = integrationRequestProducerService;
         this.archiveCaseIdRequestService = archiveCaseIdRequestService;
-        this.caseRequestService = caseRequestService;
+        this.archiveCaseRequestService = archiveCaseRequestService;
         this.caseInfoMappingService = caseInfoMappingService;
     }
 
@@ -86,7 +86,7 @@ public class AcosInstanceController {
                         getSourceApplicationId(authentication),
                         sourceApplicationInstanceId
                 )
-                .flatMap(caseRequestService::getByArchiveCaseId)
+                .flatMap(archiveCaseRequestService::getByArchiveCaseId)
                 .map(caseResource -> caseInfoMappingService.toCaseInfo(sourceApplicationInstanceId, caseResource))
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -160,15 +160,17 @@ public class AcosInstanceController {
                                     .sourceApplicationIntegrationId(sourceApplicationIntegrationId)
                                     .build();
 
-                    Long integrationId = integrationIdRequestProducerService
+                    Integration integration = integrationRequestProducerService
                             .get(sourceApplicationIdAndSourceApplicationIntegrationId)
                             .orElseThrow(() -> new NoIntegrationException(sourceApplicationIdAndSourceApplicationIntegrationId));
 
-                    instanceFlowHeadersBuilder.integrationId(integrationId);
+                    if (integration.getState() == Integration.State.DEACTIVATED) {
+                        throw new IntegrationDeactivatedException(integration);
+                    }
 
+                    instanceFlowHeadersBuilder.integrationId(integration.getId());
                 }
             }
-
 
             acosInstanceValidationService.validate(acosInstance).ifPresent((validationErrors) -> {
                 throw new InstanceValidationException(validationErrors);

@@ -1,7 +1,6 @@
-package no.fintlabs.caseinfo;
+package no.fintlabs.kafka;
 
-import lombok.extern.slf4j.Slf4j;
-import no.fint.model.resource.arkiv.noark.SakResource;
+
 import no.fintlabs.kafka.common.topic.TopicCleanupPolicyParameters;
 import no.fintlabs.kafka.requestreply.RequestProducer;
 import no.fintlabs.kafka.requestreply.RequestProducerConfiguration;
@@ -10,6 +9,8 @@ import no.fintlabs.kafka.requestreply.RequestProducerRecord;
 import no.fintlabs.kafka.requestreply.topic.ReplyTopicNameParameters;
 import no.fintlabs.kafka.requestreply.topic.ReplyTopicService;
 import no.fintlabs.kafka.requestreply.topic.RequestTopicNameParameters;
+import no.fintlabs.model.SourceApplicationIdAndSourceApplicationIntegrationId;
+import no.fintlabs.model.fint.Integration;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,47 +19,46 @@ import java.time.Duration;
 import java.util.Optional;
 
 @Service
-@Slf4j
-public class CaseRequestService {
+public class IntegrationRequestProducerService {
 
-    private final RequestProducer<String, SakResource> requestProducer;
     private final RequestTopicNameParameters requestTopicNameParameters;
 
-    public CaseRequestService(
-            @Value("${fint.kafka.application-id}") String applicationId,
-            ReplyTopicService replyTopicService,
-            RequestProducerFactory requestProducerFactory
-    ) {
-        requestTopicNameParameters = RequestTopicNameParameters.builder()
-                .resource("arkiv.noark.sak")
-                .parameterName("mappeid")
-                .build();
+    private final RequestProducer<SourceApplicationIdAndSourceApplicationIntegrationId, Integration> requestProducer;
 
+    public IntegrationRequestProducerService(
+            @Value("${fint.application-id}") String applicationId,
+            RequestProducerFactory requestProducerFactory,
+            ReplyTopicService replyTopicService
+    ) {
         ReplyTopicNameParameters replyTopicNameParameters = ReplyTopicNameParameters.builder()
                 .applicationId(applicationId)
-                .resource("arkiv.noark.sak")
+                .resource("integration")
                 .build();
 
         replyTopicService.ensureTopic(replyTopicNameParameters, 0, TopicCleanupPolicyParameters.builder().build());
 
+        this.requestTopicNameParameters = RequestTopicNameParameters.builder()
+                .resource("integration")
+                .parameterName("source-application-id-and-source-application-integration-id")
+                .build();
+
         this.requestProducer = requestProducerFactory.createProducer(
                 replyTopicNameParameters,
-                String.class,
-                SakResource.class,
+                SourceApplicationIdAndSourceApplicationIntegrationId.class,
+                Integration.class,
                 RequestProducerConfiguration
                         .builder()
-                        .defaultReplyTimeout(Duration.ofSeconds(60))
+                        .defaultReplyTimeout(Duration.ofSeconds(15))
                         .build()
         );
     }
 
-    public Optional<SakResource> getByArchiveCaseId(String archiveCaseId) {
+    public Optional<Integration> get(SourceApplicationIdAndSourceApplicationIntegrationId sourceApplicationIdAndSourceApplicationIntegrationId) {
         return requestProducer.requestAndReceive(
-                RequestProducerRecord.<String>builder()
+                RequestProducerRecord.<SourceApplicationIdAndSourceApplicationIntegrationId>builder()
                         .topicNameParameters(requestTopicNameParameters)
-                        .value(archiveCaseId)
+                        .value(sourceApplicationIdAndSourceApplicationIntegrationId)
                         .build()
         ).map(ConsumerRecord::value);
     }
-
 }

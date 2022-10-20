@@ -64,7 +64,7 @@ class InstanceMapperSpec extends Specification {
                                 .name("dokumentnavn")
                                 .type("pdfa")
                                 .encoding("UTF-8")
-                                .base64("base64String")
+//                                .base64("base64String")
                                 .build()
                 ))
                 .build()
