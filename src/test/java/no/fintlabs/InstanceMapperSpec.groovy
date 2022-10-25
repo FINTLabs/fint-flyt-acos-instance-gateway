@@ -11,12 +11,14 @@ import spock.lang.Specification
 
 class InstanceMapperSpec extends Specification {
 
+    private FileProcessingService fileProcessingService
     private AcosInstanceMapper acosInstanceMapper
     private AcosInstance acosInstance
     private Instance expectedInstance
 
     def setup() {
-        acosInstanceMapper = new AcosInstanceMapper()
+        fileProcessingService = Mock(FileProcessingService.class)
+        acosInstanceMapper = new AcosInstanceMapper(fileProcessingService)
 
         acosInstance = AcosInstance
                 .builder()
@@ -64,13 +66,15 @@ class InstanceMapperSpec extends Specification {
                                 .name("dokumentnavn")
                                 .type("pdfa")
                                 .encoding("UTF-8")
-//                                .base64("base64String")
+                                .fileId(UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e"))
                                 .build()
                 ))
                 .build()
     }
 
     def 'should map to instance'() {
+        given:
+        fileProcessingService.processFile(_ as AcosDocument) >> UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e")
         when:
         Instance instance = acosInstanceMapper.toInstance(acosInstance)
 

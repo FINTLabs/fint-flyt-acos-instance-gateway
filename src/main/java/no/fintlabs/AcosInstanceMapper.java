@@ -10,11 +10,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class AcosInstanceMapper {
+
+    private final FileProcessingService fileProcessingService;
+
+    public AcosInstanceMapper(FileProcessingService fileProcessingService) {
+        this.fileProcessingService = fileProcessingService;
+    }
 
     public Instance toInstance(AcosInstance acosInstance) {
         return Instance
@@ -48,12 +55,13 @@ public class AcosInstanceMapper {
     }
 
     private Document toDocument(AcosDocument acosDocument) {
+        UUID fileId = fileProcessingService.processFile(acosDocument);
         return Document
                 .builder()
                 .name(acosDocument.getName())
                 .type(acosDocument.getType())
                 .encoding(acosDocument.getEncoding())
-//                .base64(acosDocument.getBase64())
+                .fileId(fileId)
                 .build();
     }
 
