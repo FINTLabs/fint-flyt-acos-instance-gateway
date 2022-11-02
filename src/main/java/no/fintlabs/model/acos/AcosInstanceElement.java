@@ -17,7 +17,6 @@ public class AcosInstanceElement {
     @NotBlank
     private String id;
 
-    @NotBlank
     private String value;
 
     @Override
