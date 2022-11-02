@@ -2,6 +2,7 @@ package no.fintlabs.kafka;
 
 import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.ErrorCode;
+import no.fintlabs.IntegrationDeactivatedException;
 import no.fintlabs.NoIntegrationException;
 import no.fintlabs.flyt.kafka.event.error.InstanceFlowErrorEventProducer;
 import no.fintlabs.flyt.kafka.event.error.InstanceFlowErrorEventProducerRecord;
@@ -64,6 +65,27 @@ public class InstanceReceivalErrorEventProducerService {
                                         String.valueOf(e.getSourceApplicationIdAndSourceApplicationIntegrationId().getSourceApplicationId()),
                                         "sourceApplicationIntegrationId",
                                         e.getSourceApplicationIdAndSourceApplicationIntegrationId().getSourceApplicationIntegrationId()
+                                ))
+                                .build()
+                        ))
+                        .build()
+        );
+    }
+
+    public void publishIntegrationDeactivatedErrorEvent(InstanceFlowHeaders instanceFlowHeaders, IntegrationDeactivatedException e) {
+        instanceFlowErrorEventProducer.send(
+                InstanceFlowErrorEventProducerRecord
+                        .builder()
+                        .topicNameParameters(instanceProcessingErrorTopicNameParameters)
+                        .instanceFlowHeaders(instanceFlowHeaders)
+                        .errorCollection(new ErrorCollection(Error
+                                .builder()
+                                .errorCode(ErrorCode.INTEGRATION_DEACTIVATED_ERROR.getCode())
+                                .args(Map.of(
+                                        "sourceApplicationId",
+                                        String.valueOf(e.getIntegration().getSourceApplicationId()),
+                                        "sourceApplicationIntegrationId",
+                                        e.getIntegration().getSourceApplicationIntegrationId()
                                 ))
                                 .build()
                         ))

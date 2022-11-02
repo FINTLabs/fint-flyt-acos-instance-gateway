@@ -203,7 +203,14 @@ public class AcosInstanceController {
                     HttpStatus.UNPROCESSABLE_ENTITY,
                     e.getMessage()
             );
-        } catch (RuntimeException e) {
+        }  catch (IntegrationDeactivatedException e) {
+            instanceReceivalErrorEventProducerService.publishIntegrationDeactivatedErrorEvent(instanceFlowHeadersBuilder.build(), e);
+
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    e.getMessage()
+            );
+        }catch (RuntimeException e) {
             instanceReceivalErrorEventProducerService.publishGeneralSystemErrorEvent(instanceFlowHeadersBuilder.build());
             throw e;
         }
