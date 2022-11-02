@@ -35,7 +35,7 @@ class InstanceMapperSpec extends Specification {
                         AcosInstanceElement.builder().id("Etternavn").value("Nordmann").build(),
                         AcosInstanceElement.builder().id("Fornavn2").value("Kari").build(),
                         AcosInstanceElement.builder().id("Etternavn2").value("Ødegård").build(),
-                        AcosInstanceElement.builder().id("Ukedag").value("Tirsdag").build(),
+                        AcosInstanceElement.builder().id("Ukedag").value(null).build(),
                         AcosInstanceElement.builder().id("Farge_pa_bil").value("Grønn").build(),
 
                 ))
@@ -57,7 +57,7 @@ class InstanceMapperSpec extends Specification {
                         "Etternavn", InstanceField.builder().key("Etternavn").value("Nordmann").build(),
                         "Fornavn2", InstanceField.builder().key("Fornavn2").value("Kari").build(),
                         "Etternavn2", InstanceField.builder().key("Etternavn2").value("Ødegård").build(),
-                        "Ukedag", InstanceField.builder().key("Ukedag").value("Tirsdag").build(),
+                        "Ukedag", InstanceField.builder().key("Ukedag").value(null).build(),
                         "Farge_pa_bil", InstanceField.builder().key("Farge_pa_bil").value("Grønn").build(),
                 ))
                 .documents(List.of(
