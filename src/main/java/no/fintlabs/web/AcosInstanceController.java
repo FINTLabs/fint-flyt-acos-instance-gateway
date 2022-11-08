@@ -1,5 +1,8 @@
-package no.fintlabs;
+package no.fintlabs.web;
 
+import no.fintlabs.AcosInstanceMapper;
+import no.fintlabs.IntegrationDeactivatedException;
+import no.fintlabs.NoIntegrationException;
 import no.fintlabs.caseinfo.CaseInfoMappingService;
 import no.fintlabs.flyt.kafka.headers.InstanceFlowHeaders;
 import no.fintlabs.kafka.*;
@@ -10,7 +13,6 @@ import no.fintlabs.model.fint.caseinfo.AdministrativeUnit;
 import no.fintlabs.model.fint.caseinfo.CaseInfo;
 import no.fintlabs.model.fint.caseinfo.CaseManager;
 import no.fintlabs.model.fint.caseinfo.CaseStatus;
-import no.fintlabs.model.fint.instance.Instance;
 import no.fintlabs.resourceserver.security.client.ClientAuthorizationUtil;
 import no.fintlabs.validation.AcosInstanceValidationService;
 import no.fintlabs.validation.InstanceValidationException;
@@ -131,12 +133,13 @@ public class AcosInstanceController {
             @RequestBody AcosInstance acosInstance,
             @AuthenticationPrincipal Mono<Authentication> authenticationMono) {
 
-        return authenticationMono.map(authentication -> processInstance(acosInstance, authentication));
+        return authenticationMono.flatMap(authentication -> processInstance(acosInstance, authentication));
     }
 
-    private ResponseEntity<?> processInstance(AcosInstance acosInstance, Authentication authentication) {
+    private Mono<ResponseEntity<?>> processInstance(AcosInstance acosInstance, Authentication authentication) {
 
         InstanceFlowHeaders.InstanceFlowHeadersBuilder instanceFlowHeadersBuilder = InstanceFlowHeaders.builder();
+        SourceApplicationIdAndSourceApplicationIntegrationId sourceApplicationIdAndSourceApplicationIntegrationId = null;
 
         try {
             Long sourceApplicationId = ClientAuthorizationUtil.getSourceApplicationId(authentication);
@@ -151,24 +154,26 @@ public class AcosInstanceController {
                 instanceFlowHeadersBuilder.sourceApplicationInstanceId(acosInstance.getMetadata().getInstanceId());
 
 
-                if (!acosInstance.getMetadata().getFormId().isBlank()) {
+                if (!sourceApplicationIntegrationId.isBlank()) {
 
-                    SourceApplicationIdAndSourceApplicationIntegrationId sourceApplicationIdAndSourceApplicationIntegrationId =
+                    sourceApplicationIdAndSourceApplicationIntegrationId =
                             SourceApplicationIdAndSourceApplicationIntegrationId
                                     .builder()
                                     .sourceApplicationId(sourceApplicationId)
                                     .sourceApplicationIntegrationId(sourceApplicationIntegrationId)
                                     .build();
 
+                    SourceApplicationIdAndSourceApplicationIntegrationId finalSourceApplicationIdAndSourceApplicationIntegrationId =
+                            sourceApplicationIdAndSourceApplicationIntegrationId;
                     Integration integration = integrationRequestProducerService
                             .get(sourceApplicationIdAndSourceApplicationIntegrationId)
-                            .orElseThrow(() -> new NoIntegrationException(sourceApplicationIdAndSourceApplicationIntegrationId));
+                            .orElseThrow(() -> new NoIntegrationException(finalSourceApplicationIdAndSourceApplicationIntegrationId));
+
+                    instanceFlowHeadersBuilder.integrationId(integration.getId());
 
                     if (integration.getState() == Integration.State.DEACTIVATED) {
                         throw new IntegrationDeactivatedException(integration);
                     }
-
-                    instanceFlowHeadersBuilder.integrationId(integration.getId());
                 }
             }
 
@@ -176,14 +181,13 @@ public class AcosInstanceController {
                 throw new InstanceValidationException(validationErrors);
             });
 
-            Instance instance = acosInstanceMapper.toInstance(acosInstance);
-
-            receivedInstanceEventProducerService.publish(
+            return acosInstanceMapper.toInstance(
+                    acosInstance,
+                    sourceApplicationIdAndSourceApplicationIntegrationId
+            ).doOnNext(instance -> receivedInstanceEventProducerService.publish(
                     instanceFlowHeadersBuilder.build(),
                     instance
-            );
-
-            return ResponseEntity.accepted().build();
+            )).thenReturn(ResponseEntity.accepted().build());
 
         } catch (InstanceValidationException e) {
             instanceReceivalErrorEventProducerService.publishInstanceValidationErrorEvent(instanceFlowHeadersBuilder.build(), e);
@@ -203,14 +207,14 @@ public class AcosInstanceController {
                     HttpStatus.UNPROCESSABLE_ENTITY,
                     e.getMessage()
             );
-        }  catch (IntegrationDeactivatedException e) {
+        } catch (IntegrationDeactivatedException e) {
             instanceReceivalErrorEventProducerService.publishIntegrationDeactivatedErrorEvent(instanceFlowHeadersBuilder.build(), e);
 
             throw new ResponseStatusException(
                     HttpStatus.UNPROCESSABLE_ENTITY,
                     e.getMessage()
             );
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             instanceReceivalErrorEventProducerService.publishGeneralSystemErrorEvent(instanceFlowHeadersBuilder.build());
             throw e;
         }

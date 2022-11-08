@@ -74,7 +74,7 @@ class InstanceMapperSpec extends Specification {
 
     def 'should map to instance'() {
         given:
-        fileProcessingService.processFile(_ as AcosDocument) >> UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e")
+        fileProcessingService.processAsFile(_ as AcosDocument) >> UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e")
         when:
         Instance instance = acosInstanceMapper.toInstance(acosInstance)
 
