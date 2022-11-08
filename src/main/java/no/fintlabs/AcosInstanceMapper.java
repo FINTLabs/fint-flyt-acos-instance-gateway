@@ -1,6 +1,5 @@
 package no.fintlabs;
 
-import no.fintlabs.model.SourceApplicationIdAndSourceApplicationIntegrationId;
 import no.fintlabs.model.acos.AcosDocument;
 import no.fintlabs.model.acos.AcosInstance;
 import no.fintlabs.model.acos.AcosInstanceElement;
@@ -29,10 +28,10 @@ public class AcosInstanceMapper {
     }
 
     public Mono<Instance> toInstance(
-            AcosInstance acosInstance,
-            SourceApplicationIdAndSourceApplicationIntegrationId sourceApplicationIdAndSourceApplicationIntegrationId
+            Long sourceApplicationId,
+            AcosInstance acosInstance
     ) {
-        return toDocuments(acosInstance.getDocuments(), sourceApplicationIdAndSourceApplicationIntegrationId)
+        return toDocuments(sourceApplicationId, acosInstance.getMetadata().getInstanceId(), acosInstance.getDocuments())
                 .map(documents -> Instance
                         .builder()
                         .sourceApplicationInstanceUri(acosInstance.getMetadata().getInstanceUri())
@@ -57,32 +56,35 @@ public class AcosInstanceMapper {
     }
 
     private Mono<List<Document>> toDocuments(
-            List<AcosDocument> acosDocuments,
-            SourceApplicationIdAndSourceApplicationIntegrationId sourceApplicationIdAndSourceApplicationIntegrationId
+            Long sourceApplicationId,
+            String sourceApplicationInstanceId,
+            List<AcosDocument> acosDocuments
     ) {
         return Flux.fromIterable(acosDocuments)
-                .flatMap(acosDocument -> toDocument(acosDocument, sourceApplicationIdAndSourceApplicationIntegrationId))
+                .flatMap(acosDocument -> toDocument(sourceApplicationId, sourceApplicationInstanceId, acosDocument))
                 .collectList();
     }
 
     private Mono<Document> toDocument(
-            AcosDocument acosDocument,
-            SourceApplicationIdAndSourceApplicationIntegrationId sourceApplicationIdAndSourceApplicationIntegrationId
+            Long sourceApplicationId,
+            String sourceApplicationInstanceId,
+            AcosDocument acosDocument
     ) {
-        File file = toFile(acosDocument, sourceApplicationIdAndSourceApplicationIntegrationId);
+        File file = toFile(sourceApplicationId, sourceApplicationInstanceId, acosDocument);
         return fileClient.postFile(file)
                 .map(fileId -> toDocument(acosDocument, fileId));
     }
 
     private File toFile(
-            AcosDocument acosDocument,
-            SourceApplicationIdAndSourceApplicationIntegrationId sourceApplicationIdAndSourceApplicationIntegrationId
+            Long sourceApplicationId,
+            String sourceApplicationInstanceId,
+            AcosDocument acosDocument
     ) {
         return File
                 .builder()
                 .name(acosDocument.getName())
-                .sourceApplicationId(sourceApplicationIdAndSourceApplicationIntegrationId.getSourceApplicationId())
-                .sourceApplicationInstanceId(sourceApplicationIdAndSourceApplicationIntegrationId.getSourceApplicationIntegrationId())
+                .sourceApplicationId(sourceApplicationId)
+                .sourceApplicationInstanceId(sourceApplicationInstanceId)
                 .type(acosDocument.getType())
                 .encoding(acosDocument.getEncoding())
                 .base64Contents(acosDocument.getBase64())

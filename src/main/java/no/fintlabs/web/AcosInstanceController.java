@@ -181,13 +181,11 @@ public class AcosInstanceController {
                 throw new InstanceValidationException(validationErrors);
             });
 
-            return acosInstanceMapper.toInstance(
-                    acosInstance,
-                    sourceApplicationIdAndSourceApplicationIntegrationId
-            ).doOnNext(instance -> receivedInstanceEventProducerService.publish(
-                    instanceFlowHeadersBuilder.build(),
-                    instance
-            )).thenReturn(ResponseEntity.accepted().build());
+            return acosInstanceMapper.toInstance(sourceApplicationId, acosInstance)
+                    .doOnNext(instance -> receivedInstanceEventProducerService.publish(
+                            instanceFlowHeadersBuilder.build(),
+                            instance
+                    )).thenReturn(ResponseEntity.accepted().build());
 
         } catch (InstanceValidationException e) {
             instanceReceivalErrorEventProducerService.publishInstanceValidationErrorEvent(instanceFlowHeadersBuilder.build(), e);

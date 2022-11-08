@@ -1,24 +1,28 @@
 package no.fintlabs
 
+
 import no.fintlabs.model.acos.AcosDocument
 import no.fintlabs.model.acos.AcosInstance
 import no.fintlabs.model.acos.AcosInstanceElement
 import no.fintlabs.model.acos.AcosInstanceMetadata
+import no.fintlabs.model.fint.File
 import no.fintlabs.model.fint.instance.Document
 import no.fintlabs.model.fint.instance.Instance
 import no.fintlabs.model.fint.instance.InstanceField
+import no.fintlabs.web.FileClient
+import reactor.core.publisher.Mono
 import spock.lang.Specification
 
 class InstanceMapperSpec extends Specification {
 
-    private FileProcessingService fileProcessingService
+    private FileClient fileClient
     private AcosInstanceMapper acosInstanceMapper
     private AcosInstance acosInstance
     private Instance expectedInstance
 
     def setup() {
-        fileProcessingService = Mock(FileProcessingService.class)
-        acosInstanceMapper = new AcosInstanceMapper(fileProcessingService)
+        fileClient = Mock(FileClient.class)
+        acosInstanceMapper = new AcosInstanceMapper(fileClient)
 
         acosInstance = AcosInstance
                 .builder()
@@ -74,11 +78,21 @@ class InstanceMapperSpec extends Specification {
 
     def 'should map to instance'() {
         given:
-        fileProcessingService.processAsFile(_ as AcosDocument) >> UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e")
+        File expectedFile = File
+                .builder()
+                .name("dokumentnavn")
+                .sourceApplicationId(1)
+                .sourceApplicationInstanceId("100384")
+                .type("pdfa")
+                .encoding("UTF-8")
+                .base64Contents("base64String")
+                .build()
+
         when:
-        Instance instance = acosInstanceMapper.toInstance(acosInstance)
+        Instance instance = acosInstanceMapper.toInstance(1, acosInstance).block()
 
         then:
+        1 * fileClient.postFile(expectedFile) >> Mono.just(UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e"))
         instance == expectedInstance
     }
 
