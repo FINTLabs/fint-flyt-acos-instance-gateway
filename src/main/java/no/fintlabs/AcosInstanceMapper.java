@@ -1,13 +1,14 @@
 package no.fintlabs;
 
+import no.fintlabs.gateway.instance.InstanceMapper;
+import no.fintlabs.gateway.instance.model.File;
+import no.fintlabs.gateway.instance.model.instance.Document;
+import no.fintlabs.gateway.instance.model.instance.Instance;
+import no.fintlabs.gateway.instance.model.instance.InstanceField;
+import no.fintlabs.gateway.instance.web.FileClient;
 import no.fintlabs.model.acos.AcosDocument;
 import no.fintlabs.model.acos.AcosInstance;
 import no.fintlabs.model.acos.AcosInstanceElement;
-import no.fintlabs.model.fint.File;
-import no.fintlabs.model.fint.instance.Document;
-import no.fintlabs.model.fint.instance.Instance;
-import no.fintlabs.model.fint.instance.InstanceField;
-import no.fintlabs.web.FileClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -19,7 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class AcosInstanceMapper {
+public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
 
     private final FileClient fileClient;
 
@@ -27,7 +28,8 @@ public class AcosInstanceMapper {
         this.fileClient = fileClient;
     }
 
-    public Mono<Instance> toInstance(
+    @Override
+    public Mono<Instance> map(
             Long sourceApplicationId,
             AcosInstance acosInstance
     ) {

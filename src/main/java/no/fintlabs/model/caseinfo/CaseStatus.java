@@ -1,10 +1,11 @@
-package no.fintlabs.model.fint.caseinfo;
+package no.fintlabs.model.caseinfo;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Builder
 @Data
-public class AdministrativeUnit {
+public class CaseStatus {
     private final String name;
+    private final String code;
 }

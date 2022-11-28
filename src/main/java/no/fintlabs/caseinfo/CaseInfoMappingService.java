@@ -10,10 +10,10 @@ import no.fint.model.resource.felles.PersonResource;
 import no.fintlabs.cache.FintCache;
 import no.fintlabs.cache.exceptions.NoSuchCacheEntryException;
 import no.fintlabs.codelist.links.NoSuchLinkException;
-import no.fintlabs.model.fint.caseinfo.AdministrativeUnit;
-import no.fintlabs.model.fint.caseinfo.CaseInfo;
-import no.fintlabs.model.fint.caseinfo.CaseManager;
-import no.fintlabs.model.fint.caseinfo.CaseStatus;
+import no.fintlabs.model.caseinfo.AdministrativeUnit;
+import no.fintlabs.model.caseinfo.CaseInfo;
+import no.fintlabs.model.caseinfo.CaseManager;
+import no.fintlabs.model.caseinfo.CaseStatus;
 import org.springframework.stereotype.Service;
 
 import static no.fintlabs.codelist.links.ResourceLinkUtil.getFirstLink;

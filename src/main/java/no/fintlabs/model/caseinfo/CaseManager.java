@@ -1,4 +1,4 @@
-package no.fintlabs.model.fint.caseinfo;
+package no.fintlabs.model.caseinfo;
 
 import lombok.Builder;
 import lombok.Data;

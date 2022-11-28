@@ -1,15 +1,14 @@
 package no.fintlabs
 
-
+import no.fintlabs.gateway.instance.model.File
+import no.fintlabs.gateway.instance.model.instance.Document
+import no.fintlabs.gateway.instance.model.instance.Instance
+import no.fintlabs.gateway.instance.model.instance.InstanceField
+import no.fintlabs.gateway.instance.web.FileClient
 import no.fintlabs.model.acos.AcosDocument
 import no.fintlabs.model.acos.AcosInstance
 import no.fintlabs.model.acos.AcosInstanceElement
 import no.fintlabs.model.acos.AcosInstanceMetadata
-import no.fintlabs.model.fint.File
-import no.fintlabs.model.fint.instance.Document
-import no.fintlabs.model.fint.instance.Instance
-import no.fintlabs.model.fint.instance.InstanceField
-import no.fintlabs.web.FileClient
 import reactor.core.publisher.Mono
 import spock.lang.Specification
 
@@ -89,7 +88,7 @@ class InstanceMapperSpec extends Specification {
                 .build()
 
         when:
-        Instance instance = acosInstanceMapper.toInstance(1, acosInstance).block()
+        Instance instance = acosInstanceMapper.map(1, acosInstance).block()
 
         then:
         1 * fileClient.postFile(expectedFile) >> Mono.just(UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e"))
