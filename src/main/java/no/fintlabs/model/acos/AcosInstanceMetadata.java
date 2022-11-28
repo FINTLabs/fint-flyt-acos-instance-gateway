@@ -19,7 +19,6 @@ public class AcosInstanceMetadata {
     @NotBlank
     private String instanceId;
 
-    // TODO: 01/07/2022 Add validation when ACOS has added support for instance URI
     private String instanceUri;
 
 }
