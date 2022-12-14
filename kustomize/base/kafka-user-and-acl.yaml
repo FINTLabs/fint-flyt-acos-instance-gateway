@@ -1,7 +1,7 @@
 apiVersion: "fintlabs.no/v1alpha1"
 kind: KafkaUserAndAcl
 metadata:
-  name: fint-flyt-acos-instance-gateway-kafka
+  name: fint-flyt-acos-instance-gateway
 spec:
   acls:
     - permission: admin
