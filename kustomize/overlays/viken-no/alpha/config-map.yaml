@@ -5,8 +5,8 @@ metadata:
 data:
   TZ: 'Europe/Oslo'
   JAVA_TOOL_OPTIONS: '-XX:+ExitOnOutOfMemoryError -Xmx480M'
-  fint.org-id: 'viken.test'
-  fint.flyt.base-url: 'flyt.vigoiks.no/alpha/viken-test'
+  fint.org-id: 'viken.no'
+  fint.flyt.base-url: 'flyt.vigoiks.no/beta/viken-no'
   fint.flyt.resource-server.security.api.external.enabled: 'true'
   fint.flyt.resource-server.security.api.external.authorized-client-ids: '1'
-  spring.webflux.base-path: 'alpha/viken-test'
+  spring.webflux.base-path: 'beta/viken-no'
