@@ -17,7 +17,7 @@ patches:
   - patch: |-
       - op: replace
         path: "/spec/routes/0/match"
-        value: "Host(`flyt.vigoiks.no`) && PathPrefix(`/beta/viken-no/api/acos/instances`)"
+        value: "Host(`flyt.vigoiks.no`) && PathPrefix(`/alpha/viken-no/api/acos/instances`)"
     target:
       kind: IngressRoute
       name: fint-flyt-acos-instance-gateway
