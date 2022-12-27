@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 import static no.fintlabs.resourceserver.UrlPaths.EXTERNAL_API;
 
 @RestController
-@RequestMapping(EXTERNAL_API + "/acos/instanser")
+@RequestMapping(EXTERNAL_API + "/acos/instances")
 public class AcosInstanceController {
 
     private final InstanceProcessor<AcosInstance> instanceProcessor;
