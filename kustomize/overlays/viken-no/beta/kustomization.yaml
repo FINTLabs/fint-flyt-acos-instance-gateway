@@ -3,8 +3,6 @@ kind: Kustomization
 namespace: viken-no
 resources:
   - ../../../base
-  - deployment.yaml
-  - file-oauth2-client.yaml
 patchesStrategicMerge:
   - config-map.yaml
 commonLabels:
