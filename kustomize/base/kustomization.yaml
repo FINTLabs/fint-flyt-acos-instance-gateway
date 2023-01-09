@@ -5,3 +5,5 @@ resources:
   - service.yaml
   - ingress-route.yaml
   - config-map.yaml
+  - file-oauth2-client.yaml
+  - deployment.yaml
