@@ -4,7 +4,7 @@ namespace: viken-no
 resources:
   - ../../../base
   - deployment.yaml
-  - oauth2-file-client.yaml
+  - file-oauth2-client.yaml
 patchesStrategicMerge:
   - config-map.yaml
 commonLabels:

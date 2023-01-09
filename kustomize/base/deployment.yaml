@@ -32,6 +32,6 @@ spec:
             - secretRef:
                 name: fint-flyt-acos-instance-gateway-kafka
             - secretRef:
-                name: fint-flyt-acos-instance-gateway-oauth2-client
+                name: fint-flyt-file-oauth2-client
             - configMapRef:
                 name: fint-flyt-acos-instance-gateway
