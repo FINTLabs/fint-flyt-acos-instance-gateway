@@ -6,6 +6,7 @@ fint:
 logging:
   level:
     no.fintlabs.cache.ehcache.FintEhCacheEventLogger: WARN
+    reactor.netty.http.client: debug
 server:
   max-http-header-size: 40KB
   error:
