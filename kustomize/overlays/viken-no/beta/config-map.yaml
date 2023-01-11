@@ -6,7 +6,6 @@ data:
   TZ: 'Europe/Oslo'
   JAVA_TOOL_OPTIONS: '-XX:+ExitOnOutOfMemoryError -Xmx480M'
   fint.org-id: 'viken.no'
-  fint.flyt.file-service-url: 'http://fint-flyt-file-service:8080/beta/viken-no'
   fint.flyt.resource-server.security.api.external.enabled: 'true'
   fint.flyt.resource-server.security.api.external.authorized-client-ids: '1'
   spring.webflux.base-path: 'beta/viken-no'
