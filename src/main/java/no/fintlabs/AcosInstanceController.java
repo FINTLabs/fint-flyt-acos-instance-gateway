@@ -33,7 +33,7 @@ public class AcosInstanceController {
         this.caseInfoMappingService = caseInfoMappingService;
     }
 
-    @GetMapping("{sourceApplicationInstanceId}/saksinformasjon")
+    @GetMapping("{sourceApplicationInstanceId}/case-info")
     public Mono<ResponseEntity<CaseInfo>> getInstanceCaseInfo(
             @AuthenticationPrincipal Mono<Authentication> authenticationMono,
             @PathVariable String sourceApplicationInstanceId
