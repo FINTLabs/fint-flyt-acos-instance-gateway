@@ -63,8 +63,9 @@ public class AcosInstanceController {
     public Mono<ResponseEntity<?>> postInstance(
             @RequestBody AcosInstance acosInstance,
             @AuthenticationPrincipal Mono<Authentication> authenticationMono) {
-        log.info("Received instance: " + acosInstance);
-        return authenticationMono.flatMap(authentication -> instanceProcessor.processInstance(authentication, acosInstance));
+        return authenticationMono
+                .doOnNext(authentication -> log.info("Received instance: " + acosInstance))
+                .flatMap(authentication -> instanceProcessor.processInstance(authentication, acosInstance));
     }
 
 }
