@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import no.fintlabs.validation.UniqueElementIds;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -26,6 +27,9 @@ public class AcosInstance {
     @UniqueElementIds
     @Valid
     private List<@NotNull AcosInstanceElement> elements;
+
+    @NotBlank
+    private String formPdfBase64;
 
     @Valid
     private List<@NotNull AcosDocument> documents = new ArrayList<>();
