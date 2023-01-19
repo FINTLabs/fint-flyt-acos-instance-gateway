@@ -1,5 +1,6 @@
 package no.fintlabs;
 
+import lombok.extern.slf4j.Slf4j;
 import no.fintlabs.caseinfo.CaseInfoMappingService;
 import no.fintlabs.gateway.instance.ArchiveCaseService;
 import no.fintlabs.gateway.instance.InstanceProcessor;
@@ -15,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import static no.fintlabs.resourceserver.UrlPaths.EXTERNAL_API;
 
+@Slf4j
 @RestController
 @RequestMapping(EXTERNAL_API + "/acos/instances")
 public class AcosInstanceController {
@@ -61,6 +63,7 @@ public class AcosInstanceController {
     public Mono<ResponseEntity<?>> postInstance(
             @RequestBody AcosInstance acosInstance,
             @AuthenticationPrincipal Mono<Authentication> authenticationMono) {
+        log.info("Received instance: " + acosInstance);
         return authenticationMono.flatMap(authentication -> instanceProcessor.processInstance(authentication, acosInstance));
     }
 
