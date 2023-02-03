@@ -1,9 +1,7 @@
 package no.fintlabs
 
 import no.fintlabs.gateway.instance.model.File
-import no.fintlabs.gateway.instance.model.instance.Document
-import no.fintlabs.gateway.instance.model.instance.Instance
-import no.fintlabs.gateway.instance.model.instance.InstanceField
+import no.fintlabs.gateway.instance.model.instance.InstanceElement
 import no.fintlabs.gateway.instance.web.FileClient
 import no.fintlabs.model.acos.AcosDocument
 import no.fintlabs.model.acos.AcosInstance
@@ -17,12 +15,15 @@ class InstanceMapperSpec extends Specification {
     private FileClient fileClient
     private AcosInstanceMapper acosInstanceMapper
     private AcosInstance acosInstance
-    private Instance expectedInstance
+    private InstanceElement expectedInstance
 
     def setup() {
         fileClient = Mock(FileClient.class)
         acosInstanceMapper = new AcosInstanceMapper(fileClient)
+    }
 
+    def 'should map to instance'() {
+        given:
         acosInstance = AcosInstance
                 .builder()
                 .metadata(
@@ -30,9 +31,9 @@ class InstanceMapperSpec extends Specification {
                                 .builder()
                                 .formId("TEST0488")
                                 .instanceId("100384")
-                                .instanceUri("https://acos.com/form-instance?id=100384")
                                 .build()
                 )
+                .formPdfBase64("formPdfBase64Value")
                 .elements(List.of(
                         AcosInstanceElement.builder().id("Fornavn").value("Ola").build(),
                         AcosInstanceElement.builder().id("Etternavn").value("Nordmann").build(),
@@ -40,59 +41,95 @@ class InstanceMapperSpec extends Specification {
                         AcosInstanceElement.builder().id("Etternavn2").value("Ødegård").build(),
                         AcosInstanceElement.builder().id("Ukedag").value(null).build(),
                         AcosInstanceElement.builder().id("Farge_pa_bil").value("Grønn").build(),
-
                 ))
                 .documents(List.of(
                         AcosDocument.builder()
-                                .name("dokumentnavn")
-                                .type("pdfa")
-                                .encoding("UTF-8")
-                                .base64("base64String")
+                                .name("vedleggImageNavn")
+                                .type("image/jpeg")
+                                .encoding(null)
+                                .base64("vedleggImageBase64Value")
+                                .build(),
+                        AcosDocument.builder()
+                                .name("vedleggVideoNavn")
+                                .type("video/mp4")
+                                .encoding(null)
+                                .base64("vedleggVideoBase64Value")
                                 .build()
                 ))
                 .build()
 
-        expectedInstance = Instance
+        File expectedSkjemaPdfFile = File
                 .builder()
-                .sourceApplicationInstanceUri("https://acos.com/form-instance?id=100384")
-                .fieldPerKey(Map.of(
-                        "Fornavn", InstanceField.builder().key("Fornavn").value("Ola").build(),
-                        "Etternavn", InstanceField.builder().key("Etternavn").value("Nordmann").build(),
-                        "Fornavn2", InstanceField.builder().key("Fornavn2").value("Kari").build(),
-                        "Etternavn2", InstanceField.builder().key("Etternavn2").value("Ødegård").build(),
-                        "Ukedag", InstanceField.builder().key("Ukedag").value(null).build(),
-                        "Farge_pa_bil", InstanceField.builder().key("Farge_pa_bil").value("Grønn").build(),
-                ))
-                .documents(List.of(
-                        Document
-                                .builder()
-                                .name("dokumentnavn")
-                                .type("pdfa")
-                                .encoding("UTF-8")
-                                .fileId(UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e"))
-                                .build()
-                ))
-                .build()
-    }
-
-    def 'should map to instance'() {
-        given:
-        File expectedFile = File
-                .builder()
-                .name("dokumentnavn")
+                .name("skjemaPdf")
                 .sourceApplicationId(1)
                 .sourceApplicationInstanceId("100384")
-                .type("pdfa")
+                .type("application/pdf")
                 .encoding("UTF-8")
-                .base64Contents("base64String")
+                .base64Contents("formPdfBase64Value")
+                .build()
+
+        File expectedVedleggImageFile = File
+                .builder()
+                .name("vedleggImageNavn")
+                .sourceApplicationId(1)
+                .sourceApplicationInstanceId("100384")
+                .type("image/jpeg")
+                .encoding(null)
+                .base64Contents("vedleggImageBase64Value")
+                .build()
+
+        File expectedVedleggVideoFile = File
+                .builder()
+                .name("vedleggVideoNavn")
+                .sourceApplicationId(1)
+                .sourceApplicationInstanceId("100384")
+                .type("video/mp4")
+                .encoding(null)
+                .base64Contents("vedleggVideoBase64Value")
                 .build()
 
         when:
-        Instance instance = acosInstanceMapper.map(1, acosInstance).block()
+        InstanceElement instance = acosInstanceMapper.map(1, acosInstance).block()
 
         then:
-        1 * fileClient.postFile(expectedFile) >> Mono.just(UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e"))
-        instance == expectedInstance
+        1 * fileClient.postFile(expectedSkjemaPdfFile) >> Mono.just(UUID.fromString("391e9177-2790-469a-9f42-c8042731bc55"))
+        1 * fileClient.postFile(expectedVedleggImageFile) >> Mono.just(UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e"))
+        1 * fileClient.postFile(expectedVedleggVideoFile) >> Mono.just(UUID.fromString("5a15e2dd-29a7-41ac-a635-f4ab41d10d18"))
+
+        instance == InstanceElement
+                .builder()
+                .valuePerKey(Map.of(
+                        "skjema.Fornavn", "Ola",
+                        "skjema.Etternavn", "Nordmann",
+                        "skjema.Fornavn2", "Kari",
+                        "skjema.Etternavn2", "Ødegård",
+                        "skjema.Ukedag", "",
+                        "skjema.Farge_pa_bil", "Grønn",
+                        "skjemaPdf", "391e9177-2790-469a-9f42-c8042731bc55"
+                ))
+                .elementCollectionPerKey(Map.of(
+                        "vedlegg", List.of(
+                        InstanceElement
+                                .builder()
+                                .valuePerKey(Map.of(
+                                        "navn", "vedleggImageNavn",
+                                        "type", "image/jpeg",
+                                        "enkoding", "",
+                                        "fil", "dab3ecc8-2901-46f0-9553-2fbc3e71ae9e"
+                                ))
+                                .build(),
+                        InstanceElement
+                                .builder()
+                                .valuePerKey(Map.of(
+                                        "navn", "vedleggVideoNavn",
+                                        "type", "video/mp4",
+                                        "enkoding", "",
+                                        "fil", "5a15e2dd-29a7-41ac-a635-f4ab41d10d18"
+                                ))
+                                .build()
+                )
+                ))
+                .build()
     }
 
 }

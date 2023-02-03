@@ -13,10 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,25 +30,16 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
             Long sourceApplicationId,
             AcosInstance acosInstance
     ) {
-
-        Mono<UUID> formPdfFileIdMono = fileClient.postFile(File
-                .builder()
-                .name("skjemaPdf")
-                .type(MediaType.APPLICATION_PDF_VALUE)
-                .sourceApplicationId(sourceApplicationId)
-                .sourceApplicationInstanceId(acosInstance.getMetadata().getInstanceId())
-                .encoding("UTF-8")
-                .base64Contents(acosInstance.getFormPdfBase64())
-                .build()
-        );
-
         return Mono.zip(
-                        formPdfFileIdMono,
+                        mapPdfFileToFileId(sourceApplicationId, acosInstance),
                         mapDocumentsToInstanceElements(sourceApplicationId, acosInstance.getMetadata().getInstanceId(), acosInstance.getDocuments())
                 )
                 .map((Tuple2<UUID, List<InstanceElement>> formPdfFileIdAndDocumentInstanceElement) -> InstanceElement
                         .builder()
-                        .valuePerKey(toValuePerKey(acosInstance.getElements(), formPdfFileIdAndDocumentInstanceElement.getT1()))
+                        .valuePerKey(toValuePerKey(
+                                acosInstance.getElements(),
+                                formPdfFileIdAndDocumentInstanceElement.getT1()
+                        ))
                         .elementCollectionPerKey(Map.of(
                                 "vedlegg", formPdfFileIdAndDocumentInstanceElement.getT2()
                         ))
@@ -65,13 +53,27 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
         Map<String, String> valuePerKey = acosInstanceElements
                 .stream()
                 .collect(Collectors.toMap(
-                        AcosInstanceElement::getId,
-                        AcosInstanceElement::getValue
+                        acosInstanceElement -> "skjema." + acosInstanceElement.getId(),
+                        acosInstanceElement -> Optional.ofNullable(acosInstanceElement.getValue()).orElse("")
                 ));
 
         valuePerKey.put("skjemaPdf", formPdfFileid.toString());
 
         return valuePerKey;
+    }
+
+    private Mono<UUID> mapPdfFileToFileId(Long sourceApplicationId, AcosInstance acosInstance) {
+        return fileClient.postFile(
+                File
+                        .builder()
+                        .name("skjemaPdf")
+                        .type(MediaType.APPLICATION_PDF_VALUE)
+                        .sourceApplicationId(sourceApplicationId)
+                        .sourceApplicationInstanceId(acosInstance.getMetadata().getInstanceId())
+                        .encoding("UTF-8")
+                        .base64Contents(acosInstance.getFormPdfBase64())
+                        .build()
+        );
     }
 
     private Mono<List<InstanceElement>> mapDocumentsToInstanceElements(
@@ -116,7 +118,7 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
                 .valuePerKey(Map.of(
                         "navn", acosDocument.getName(),
                         "type", acosDocument.getType(),
-                        "enkoding", acosDocument.getEncoding(),
+                        "enkoding", Optional.ofNullable(acosDocument.getEncoding()).orElse(""),
                         "fil", fileId.toString()
                 ))
                 .build();
