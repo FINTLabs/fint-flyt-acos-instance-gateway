@@ -19,7 +19,6 @@ public class AcosDocument {
     @NotBlank
     private String type;
 
-    @NotBlank
     private String encoding;
 
     @NotBlank

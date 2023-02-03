@@ -2,21 +2,18 @@ package no.fintlabs;
 
 import no.fintlabs.gateway.instance.InstanceMapper;
 import no.fintlabs.gateway.instance.model.File;
-import no.fintlabs.gateway.instance.model.instance.Document;
-import no.fintlabs.gateway.instance.model.instance.Instance;
-import no.fintlabs.gateway.instance.model.instance.InstanceField;
+import no.fintlabs.gateway.instance.model.instance.InstanceElement;
 import no.fintlabs.gateway.instance.web.FileClient;
 import no.fintlabs.model.acos.AcosDocument;
 import no.fintlabs.model.acos.AcosInstance;
 import no.fintlabs.model.acos.AcosInstanceElement;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Function;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,52 +26,74 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
     }
 
     @Override
-    public Mono<Instance> map(
+    public Mono<InstanceElement> map(
             Long sourceApplicationId,
             AcosInstance acosInstance
     ) {
-        return toDocuments(sourceApplicationId, acosInstance.getMetadata().getInstanceId(), acosInstance.getDocuments())
-                .map(documents -> Instance
+        return Mono.zip(
+                        mapPdfFileToFileId(sourceApplicationId, acosInstance),
+                        mapDocumentsToInstanceElements(sourceApplicationId, acosInstance.getMetadata().getInstanceId(), acosInstance.getDocuments())
+                )
+                .map((Tuple2<UUID, List<InstanceElement>> formPdfFileIdAndDocumentInstanceElement) -> InstanceElement
                         .builder()
-                        .sourceApplicationInstanceUri(acosInstance.getMetadata().getInstanceUri())
-                        .fieldPerKey(toFieldPerKey(acosInstance.getElements()))
-                        .documents(documents)
+                        .valuePerKey(toValuePerKey(
+                                acosInstance.getElements(),
+                                formPdfFileIdAndDocumentInstanceElement.getT1()
+                        ))
+                        .elementCollectionPerKey(Map.of(
+                                "vedlegg", formPdfFileIdAndDocumentInstanceElement.getT2()
+                        ))
                         .build());
     }
 
-    private Map<String, InstanceField> toFieldPerKey(List<AcosInstanceElement> acosInstanceElements) {
-        return acosInstanceElements
+    private Map<String, String> toValuePerKey(
+            Collection<AcosInstanceElement> acosInstanceElements,
+            UUID formPdfFileid
+    ) {
+        Map<String, String> valuePerKey = acosInstanceElements
                 .stream()
-                .map(acosInstanceElement -> InstanceField
-                        .builder()
-                        .key(acosInstanceElement.getId())
-                        .value(acosInstanceElement.getValue())
-                        .build()
-                )
                 .collect(Collectors.toMap(
-                        InstanceField::getKey,
-                        Function.identity()
+                        acosInstanceElement -> "skjema." + acosInstanceElement.getId(),
+                        acosInstanceElement -> Optional.ofNullable(acosInstanceElement.getValue()).orElse("")
                 ));
+
+        valuePerKey.put("skjemaPdf", formPdfFileid.toString());
+
+        return valuePerKey;
     }
 
-    private Mono<List<Document>> toDocuments(
+    private Mono<UUID> mapPdfFileToFileId(Long sourceApplicationId, AcosInstance acosInstance) {
+        return fileClient.postFile(
+                File
+                        .builder()
+                        .name("skjemaPdf")
+                        .type(MediaType.APPLICATION_PDF_VALUE)
+                        .sourceApplicationId(sourceApplicationId)
+                        .sourceApplicationInstanceId(acosInstance.getMetadata().getInstanceId())
+                        .encoding("UTF-8")
+                        .base64Contents(acosInstance.getFormPdfBase64())
+                        .build()
+        );
+    }
+
+    private Mono<List<InstanceElement>> mapDocumentsToInstanceElements(
             Long sourceApplicationId,
             String sourceApplicationInstanceId,
-            List<AcosDocument> acosDocuments
+            Collection<AcosDocument> acosDocuments
     ) {
         return Flux.fromIterable(acosDocuments)
-                .flatMap(acosDocument -> toDocument(sourceApplicationId, sourceApplicationInstanceId, acosDocument))
+                .flatMap(acosDocument -> mapDocumentToInstanceElement(sourceApplicationId, sourceApplicationInstanceId, acosDocument))
                 .collectList();
     }
 
-    private Mono<Document> toDocument(
+    private Mono<InstanceElement> mapDocumentToInstanceElement(
             Long sourceApplicationId,
             String sourceApplicationInstanceId,
             AcosDocument acosDocument
     ) {
         File file = toFile(sourceApplicationId, sourceApplicationInstanceId, acosDocument);
         return fileClient.postFile(file)
-                .map(fileId -> toDocument(acosDocument, fileId));
+                .map(fileId -> toInstanceElement(acosDocument, fileId));
     }
 
     private File toFile(
@@ -93,13 +112,15 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
                 .build();
     }
 
-    private Document toDocument(AcosDocument acosDocument, UUID fileId) {
-        return Document
+    private InstanceElement toInstanceElement(AcosDocument acosDocument, UUID fileId) {
+        return InstanceElement
                 .builder()
-                .name(acosDocument.getName())
-                .type(acosDocument.getType())
-                .encoding(acosDocument.getEncoding())
-                .fileId(fileId)
+                .valuePerKey(Map.of(
+                        "navn", acosDocument.getName(),
+                        "type", acosDocument.getType(),
+                        "enkoding", Optional.ofNullable(acosDocument.getEncoding()).orElse(""),
+                        "fil", fileId.toString()
+                ))
                 .build();
     }
 
