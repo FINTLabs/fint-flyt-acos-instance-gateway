@@ -7,6 +7,7 @@ import no.fintlabs.model.acos.AcosDocument
 import no.fintlabs.model.acos.AcosInstance
 import no.fintlabs.model.acos.AcosInstanceElement
 import no.fintlabs.model.acos.AcosInstanceMetadata
+import org.springframework.http.MediaType
 import reactor.core.publisher.Mono
 import spock.lang.Specification
 
@@ -45,13 +46,13 @@ class InstanceMapperSpec extends Specification {
                 .documents(List.of(
                         AcosDocument.builder()
                                 .name("vedleggImageNavn")
-                                .type("image/jpeg")
+                                .type(MediaType.IMAGE_JPEG)
                                 .encoding(null)
                                 .base64("vedleggImageBase64Value")
                                 .build(),
                         AcosDocument.builder()
                                 .name("vedleggVideoNavn")
-                                .type("video/mp4")
+                                .type(MediaType.parseMediaType("video/mp4"))
                                 .encoding(null)
                                 .base64("vedleggVideoBase64Value")
                                 .build()

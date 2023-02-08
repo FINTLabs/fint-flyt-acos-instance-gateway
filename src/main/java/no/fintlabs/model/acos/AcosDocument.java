@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.MediaType;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
@@ -16,8 +18,8 @@ public class AcosDocument {
     @NotBlank
     private String name;
 
-    @NotBlank
-    private String type;
+    @NotNull
+    private MediaType type;
 
     private String encoding;
 

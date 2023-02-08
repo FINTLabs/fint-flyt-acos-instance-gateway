@@ -106,7 +106,7 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
                 .name(acosDocument.getName())
                 .sourceApplicationId(sourceApplicationId)
                 .sourceApplicationInstanceId(sourceApplicationInstanceId)
-                .type(acosDocument.getType())
+                .type(acosDocument.getType().toString())
                 .encoding(acosDocument.getEncoding())
                 .base64Contents(acosDocument.getBase64())
                 .build();
@@ -117,7 +117,7 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
                 .builder()
                 .valuePerKey(Map.of(
                         "navn", acosDocument.getName(),
-                        "type", acosDocument.getType(),
+                        "type", acosDocument.getType().toString(),
                         "enkoding", Optional.ofNullable(acosDocument.getEncoding()).orElse(""),
                         "fil", fileId.toString()
                 ))
