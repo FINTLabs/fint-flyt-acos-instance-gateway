@@ -67,7 +67,7 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
                 File
                         .builder()
                         .name("skjemaPdf")
-                        .type(MediaType.APPLICATION_PDF_VALUE)
+                        .type(MediaType.APPLICATION_PDF)
                         .sourceApplicationId(sourceApplicationId)
                         .sourceApplicationInstanceId(acosInstance.getMetadata().getInstanceId())
                         .encoding("UTF-8")
@@ -106,7 +106,7 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
                 .name(acosDocument.getName())
                 .sourceApplicationId(sourceApplicationId)
                 .sourceApplicationInstanceId(sourceApplicationInstanceId)
-                .type(acosDocument.getType().toString())
+                .type(acosDocument.getType())
                 .encoding(acosDocument.getEncoding())
                 .base64Contents(acosDocument.getBase64())
                 .build();
