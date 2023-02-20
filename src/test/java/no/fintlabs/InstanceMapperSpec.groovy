@@ -16,7 +16,6 @@ class InstanceMapperSpec extends Specification {
     private FileClient fileClient
     private AcosInstanceMapper acosInstanceMapper
     private AcosInstance acosInstance
-    private InstanceElement expectedInstance
 
     def setup() {
         fileClient = Mock(FileClient.class)
@@ -64,7 +63,7 @@ class InstanceMapperSpec extends Specification {
                 .name("skjemaPdf")
                 .sourceApplicationId(1)
                 .sourceApplicationInstanceId("100384")
-                .type("application/pdf")
+                .type(MediaType.APPLICATION_PDF)
                 .encoding("UTF-8")
                 .base64Contents("formPdfBase64Value")
                 .build()
@@ -74,7 +73,7 @@ class InstanceMapperSpec extends Specification {
                 .name("vedleggImageNavn")
                 .sourceApplicationId(1)
                 .sourceApplicationInstanceId("100384")
-                .type("image/jpeg")
+                .type(MediaType.IMAGE_JPEG)
                 .encoding(null)
                 .base64Contents("vedleggImageBase64Value")
                 .build()
@@ -84,7 +83,7 @@ class InstanceMapperSpec extends Specification {
                 .name("vedleggVideoNavn")
                 .sourceApplicationId(1)
                 .sourceApplicationInstanceId("100384")
-                .type("video/mp4")
+                .type(MediaType.parseMediaType("video/mp4"))
                 .encoding(null)
                 .base64Contents("vedleggVideoBase64Value")
                 .build()
