@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import no.fintlabs.gateway.instance.validation.constraints.ValidBase64;
 import no.fintlabs.validation.UniqueElementIds;
 
 import javax.validation.Valid;
@@ -29,6 +30,7 @@ public class AcosInstance {
     private List<@NotNull AcosInstanceElement> elements;
 
     @NotBlank
+    @ValidBase64
     private String formPdfBase64;
 
     @Valid
