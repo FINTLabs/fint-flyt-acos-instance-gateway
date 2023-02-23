@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import no.fintlabs.gateway.instance.validation.constraints.ValidBase64;
 import org.springframework.http.MediaType;
 
 import javax.validation.constraints.NotBlank;
@@ -24,6 +25,7 @@ public class AcosDocument {
     private String encoding;
 
     @NotBlank
+    @ValidBase64
     private String base64;
 
 }
