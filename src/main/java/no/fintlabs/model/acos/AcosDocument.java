@@ -24,7 +24,7 @@ public class AcosDocument {
 
     private String encoding;
 
-    @NotBlank
+    @NotNull
     @ValidBase64
     private String base64;
 
