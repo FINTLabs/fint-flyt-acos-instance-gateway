@@ -1,7 +1,7 @@
 package no.fintlabs
 
 import no.fintlabs.gateway.instance.model.File
-import no.fintlabs.gateway.instance.model.instance.InstanceElement
+import no.fintlabs.gateway.instance.model.instance.InstanceObject
 import no.fintlabs.gateway.instance.web.FileClient
 import no.fintlabs.model.acos.AcosDocument
 import no.fintlabs.model.acos.AcosInstance
@@ -89,14 +89,14 @@ class InstanceMapperSpec extends Specification {
                 .build()
 
         when:
-        InstanceElement instance = acosInstanceMapper.map(1, acosInstance).block()
+        InstanceObject instance = acosInstanceMapper.map(1, acosInstance).block()
 
         then:
         1 * fileClient.postFile(expectedSkjemaPdfFile) >> Mono.just(UUID.fromString("391e9177-2790-469a-9f42-c8042731bc55"))
         1 * fileClient.postFile(expectedVedleggImageFile) >> Mono.just(UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e"))
         1 * fileClient.postFile(expectedVedleggVideoFile) >> Mono.just(UUID.fromString("5a15e2dd-29a7-41ac-a635-f4ab41d10d18"))
 
-        instance == InstanceElement
+        instance == InstanceObject
                 .builder()
                 .valuePerKey(Map.of(
                         "skjema.Fornavn", "Ola",
@@ -107,9 +107,9 @@ class InstanceMapperSpec extends Specification {
                         "skjema.Farge_pa_bil", "Grønn",
                         "skjemaPdf", "391e9177-2790-469a-9f42-c8042731bc55"
                 ))
-                .elementCollectionPerKey(Map.of(
+                .objectCollectionPerKey(Map.of(
                         "vedlegg", List.of(
-                        InstanceElement
+                        InstanceObject
                                 .builder()
                                 .valuePerKey(Map.of(
                                         "navn", "vedleggImageNavn",
@@ -118,7 +118,7 @@ class InstanceMapperSpec extends Specification {
                                         "fil", "dab3ecc8-2901-46f0-9553-2fbc3e71ae9e"
                                 ))
                                 .build(),
-                        InstanceElement
+                        InstanceObject
                                 .builder()
                                 .valuePerKey(Map.of(
                                         "navn", "vedleggVideoNavn",
