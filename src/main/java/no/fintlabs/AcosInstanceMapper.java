@@ -32,7 +32,7 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
     ) {
         return Mono.zip(
                         mapPdfFileToFileId(sourceApplicationId, acosInstance),
-                        mapDocumentsToInstanceElements(sourceApplicationId, acosInstance.getMetadata().getInstanceId(), acosInstance.getDocuments())
+                        mapDocumentsToInstanceObjects(sourceApplicationId, acosInstance.getMetadata().getInstanceId(), acosInstance.getDocuments())
                 )
                 .map((Tuple2<UUID, List<InstanceObject>> formPdfFileIdAndDocumentInstanceElement) -> InstanceObject
                         .builder()
@@ -76,24 +76,24 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
         );
     }
 
-    private Mono<List<InstanceObject>> mapDocumentsToInstanceElements(
+    private Mono<List<InstanceObject>> mapDocumentsToInstanceObjects(
             Long sourceApplicationId,
             String sourceApplicationInstanceId,
             Collection<AcosDocument> acosDocuments
     ) {
         return Flux.fromIterable(acosDocuments)
-                .flatMap(acosDocument -> mapDocumentToInstanceElement(sourceApplicationId, sourceApplicationInstanceId, acosDocument))
+                .flatMap(acosDocument -> mapDocumentToInstanceObject(sourceApplicationId, sourceApplicationInstanceId, acosDocument))
                 .collectList();
     }
 
-    private Mono<InstanceObject> mapDocumentToInstanceElement(
+    private Mono<InstanceObject> mapDocumentToInstanceObject(
             Long sourceApplicationId,
             String sourceApplicationInstanceId,
             AcosDocument acosDocument
     ) {
         File file = toFile(sourceApplicationId, sourceApplicationInstanceId, acosDocument);
         return fileClient.postFile(file)
-                .map(fileId -> toInstanceElement(acosDocument, fileId));
+                .map(fileId -> toInstanceObject(acosDocument, fileId));
     }
 
     private File toFile(
@@ -112,7 +112,7 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
                 .build();
     }
 
-    private InstanceObject toInstanceElement(AcosDocument acosDocument, UUID fileId) {
+    private InstanceObject toInstanceObject(AcosDocument acosDocument, UUID fileId) {
         return InstanceObject
                 .builder()
                 .valuePerKey(Map.of(
