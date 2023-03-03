@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import no.fintlabs.validation.NotInstanceField;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Objects;
@@ -15,6 +16,7 @@ import java.util.Objects;
 public class AcosInstanceElement {
 
     @NotBlank
+    @NotInstanceField
     private String id;
 
     private String value;
