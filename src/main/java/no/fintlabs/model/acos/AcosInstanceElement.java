@@ -7,10 +7,8 @@ import javax.validation.constraints.NotBlank;
 import java.util.Objects;
 
 @Getter
-@EqualsAndHashCode
 @Jacksonized
 @Builder
-
 public class AcosInstanceElement {
 
     @NotBlank

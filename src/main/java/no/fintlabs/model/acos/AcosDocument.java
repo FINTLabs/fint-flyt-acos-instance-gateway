@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode
 @Jacksonized
 @Builder
-
 public class AcosDocument {
 
     @NotBlank

@@ -9,7 +9,6 @@ import javax.validation.constraints.NotBlank;
 @EqualsAndHashCode
 @Jacksonized
 @Builder
-
 public class AcosInstanceMetadata {
 
     @NotBlank
