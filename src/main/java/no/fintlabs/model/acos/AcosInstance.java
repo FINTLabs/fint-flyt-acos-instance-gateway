@@ -1,9 +1,7 @@
 package no.fintlabs.model.acos;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.extern.jackson.Jacksonized;
 import no.fintlabs.gateway.instance.validation.constraints.ValidBase64;
 import no.fintlabs.validation.UniqueElementIds;
 
@@ -14,10 +12,10 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@EqualsAndHashCode
+@Jacksonized
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class AcosInstance {
 
     @NotNull
