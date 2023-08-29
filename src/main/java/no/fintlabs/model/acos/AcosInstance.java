@@ -34,4 +34,9 @@ public class AcosInstance {
     @Valid
     private List<@NotNull AcosDocument> documents = new ArrayList<>();
 
+    @Override
+    public String toString() {
+        return "Sensitive data omitted";
+    }
+
 }

@@ -2,7 +2,6 @@ package no.fintlabs.model.caseinfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
@@ -18,4 +17,9 @@ public class CaseInfo {
     private final CaseManager caseManager;
     private final AdministrativeUnit administrativeUnit;
     private final CaseStatus status;
+
+    @Override
+    public String toString() {
+        return "Sensitive data omitted";
+    }
 }

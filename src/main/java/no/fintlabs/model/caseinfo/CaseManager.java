@@ -1,7 +1,6 @@
 package no.fintlabs.model.caseinfo;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
@@ -16,4 +15,9 @@ public class CaseManager {
     private final String lastName;
     private final String email;
     private final String phone;
+
+    @Override
+    public String toString() {
+        return "Sensitive data omitted";
+    }
 }

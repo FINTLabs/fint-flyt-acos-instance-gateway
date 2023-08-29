@@ -1,7 +1,6 @@
 package no.fintlabs.model.caseinfo;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.jackson.Jacksonized;
@@ -13,4 +12,9 @@ import lombok.extern.jackson.Jacksonized;
 public class CaseStatus {
     private final String name;
     private final String code;
+
+    @Override
+    public String toString() {
+        return "Sensitive data omitted";
+    }
 }

@@ -19,4 +19,9 @@ public class AcosInstanceMetadata {
 
     private String instanceUri;
 
+    @Override
+    public String toString() {
+        return "Sensitive data omitted";
+    }
+
 }

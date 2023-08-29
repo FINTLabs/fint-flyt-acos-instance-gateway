@@ -29,4 +29,9 @@ public class AcosInstanceElement {
         return Objects.hash(id);
     }
 
+    @Override
+    public String toString() {
+        return "Sensitive data omitted";
+    }
+
 }
