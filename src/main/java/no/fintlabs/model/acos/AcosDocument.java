@@ -25,10 +25,4 @@ public class AcosDocument {
     @NotNull
     @ValidBase64
     private String base64;
-
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
-
 }

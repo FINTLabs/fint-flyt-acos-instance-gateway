@@ -12,9 +12,4 @@ import lombok.extern.jackson.Jacksonized;
 public class CaseStatus {
     private final String name;
     private final String code;
-
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
 }

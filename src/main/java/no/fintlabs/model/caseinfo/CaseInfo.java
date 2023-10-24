@@ -17,9 +17,4 @@ public class CaseInfo {
     private final CaseManager caseManager;
     private final AdministrativeUnit administrativeUnit;
     private final CaseStatus status;
-
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
 }

@@ -15,9 +15,4 @@ public class CaseManager {
     private final String lastName;
     private final String email;
     private final String phone;
-
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
 }

@@ -11,9 +11,4 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 public class AdministrativeUnit {
     private final String name;
-
-    @Override
-    public String toString() {
-        return "Sensitive data omitted";
-    }
 }
