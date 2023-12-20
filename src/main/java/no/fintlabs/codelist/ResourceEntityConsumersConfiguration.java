@@ -7,12 +7,11 @@ import no.fint.model.resource.arkiv.noark.AdministrativEnhetResource;
 import no.fint.model.resource.arkiv.noark.ArkivressursResource;
 import no.fint.model.resource.felles.PersonResource;
 import no.fintlabs.cache.FintCache;
+import no.fintlabs.codelist.links.ResourceLinkUtil;
 import no.fintlabs.kafka.entity.EntityConsumerFactoryService;
 import no.fintlabs.kafka.entity.topic.EntityTopicNameParameters;
-import no.fintlabs.codelist.links.ResourceLinkUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.listener.CommonLoggingErrorHandler;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 @Configuration
@@ -30,13 +29,12 @@ public class ResourceEntityConsumersConfiguration {
             Class<T> resourceClass,
             FintCache<String, T> cache
     ) {
-        return entityConsumerFactoryService.createFactory(
+        return entityConsumerFactoryService.createRecordConsumerFactory(
                 resourceClass,
                 consumerRecord -> cache.put(
                         ResourceLinkUtil.getSelfLinks(consumerRecord.value()),
                         consumerRecord.value()
-                ),
-                new CommonLoggingErrorHandler()
+                )
         ).createContainer(EntityTopicNameParameters.builder().resource(resourceReference).build());
     }
 
