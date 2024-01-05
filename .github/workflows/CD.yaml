@@ -52,25 +52,27 @@ jobs:
       packages: write
     strategy:
       matrix:
-        include:
-          - org: viken-no
-            cluster: aks-api-fint-2022-02-08
-          - org: viken-no
-            cluster: aks-beta-fint-2021-11-23
+        org:
+          - afk-no
+          - bfk-no
+          - ofk-no
+        cluster:
+          - aks-beta-fint-2021-11-23
+          - aks-api-fint-2022-02-08
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Get environment
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: environment
         with:
           script: return '${{ matrix.cluster }}'.split('-')[1]
           result-encoding: string
 
       - name: Get resource group name
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: resource-group
         with:
           script: return 'rg-aks-${{ steps.environment.outputs.result }}'
