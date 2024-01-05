@@ -12,7 +12,7 @@ commonLabels:
 patches:
   - patch: |-
       - op: replace
-        path: "/spec/kbfka/acls/0/topic"
+        path: "/spec/kafka/acls/0/topic"
         value: "bfk-no.flyt.*"
       - op: replace
         path: "/spec/orgId"
