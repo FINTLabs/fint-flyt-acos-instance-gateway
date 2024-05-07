@@ -32,7 +32,7 @@ jobs:
         uses: docker/metadata-action@v5
         id: meta
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
           tags: type=sha,enable=true,priority=100,prefix=shaF-,suffix=,format=short
 
       - name: Build and push Docker image
@@ -59,6 +59,11 @@ jobs:
         cluster:
           - aks-beta-fint-2021-11-23
           - aks-api-fint-2022-02-08
+        exclude:
+          - org: afk-no
+            cluster: aks-beta-fint-2021-11-23
+          - org: bfk-no
+            cluster: aks-beta-fint-2021-11-23
 
     steps:
       - name: Checkout repository
