@@ -2,7 +2,6 @@ package no.fintlabs;
 
 import no.fintlabs.gateway.instance.model.File;
 import no.fintlabs.gateway.instance.model.instance.InstanceObject;
-import no.fintlabs.gateway.instance.web.FileClient;
 import no.fintlabs.model.acos.AcosDocument;
 import no.fintlabs.model.acos.AcosInstance;
 import no.fintlabs.model.acos.AcosInstanceElement;
@@ -15,19 +14,21 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class InstanceMapperTest {
 
-    private FileClient fileClient;
     private AcosInstanceMapper acosInstanceMapper;
+    Function<File, Mono<UUID>> persistFile;
 
     @BeforeEach
     void setup() {
-        fileClient = mock(FileClient.class);
-        acosInstanceMapper = new AcosInstanceMapper(fileClient);
+        acosInstanceMapper = new AcosInstanceMapper();
+        persistFile = mock(Function.class);
     }
 
     @Test
@@ -96,11 +97,15 @@ class InstanceMapperTest {
                 .base64Contents("vedleggVideoBase64Value")
                 .build();
 
-        when(fileClient.postFile(expectedSkjemaPdfFile)).thenReturn(Mono.just(UUID.fromString("391e9177-2790-469a-9f42-c8042731bc55")));
-        when(fileClient.postFile(expectedVedleggImageFile)).thenReturn(Mono.just(UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e")));
-        when(fileClient.postFile(expectedVedleggVideoFile)).thenReturn(Mono.just(UUID.fromString("5a15e2dd-29a7-41ac-a635-f4ab41d10d18")));
+        when(persistFile.apply(expectedSkjemaPdfFile)).thenReturn(Mono.just(UUID.fromString("391e9177-2790-469a-9f42-c8042731bc55")));
+        when(persistFile.apply(expectedVedleggImageFile)).thenReturn(Mono.just(UUID.fromString("dab3ecc8-2901-46f0-9553-2fbc3e71ae9e")));
+        when(persistFile.apply(expectedVedleggVideoFile)).thenReturn(Mono.just(UUID.fromString("5a15e2dd-29a7-41ac-a635-f4ab41d10d18")));
 
-        InstanceObject instance = acosInstanceMapper.map(1L, acosInstance).block();
+        InstanceObject instance = acosInstanceMapper.map(
+                1L,
+                acosInstance,
+                persistFile
+        ).block();
 
         InstanceObject expectedInstanceObject = InstanceObject
                 .builder()
