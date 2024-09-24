@@ -3,7 +3,6 @@ package no.fintlabs;
 import no.fintlabs.gateway.instance.InstanceMapper;
 import no.fintlabs.gateway.instance.model.File;
 import no.fintlabs.gateway.instance.model.instance.InstanceObject;
-import no.fintlabs.gateway.instance.web.FileClient;
 import no.fintlabs.model.acos.AcosDocument;
 import no.fintlabs.model.acos.AcosInstance;
 import no.fintlabs.model.acos.AcosInstanceElement;
@@ -14,25 +13,21 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
 
-    private final FileClient fileClient;
-
-    public AcosInstanceMapper(FileClient fileClient) {
-        this.fileClient = fileClient;
-    }
-
     @Override
     public Mono<InstanceObject> map(
             Long sourceApplicationId,
-            AcosInstance acosInstance
+            AcosInstance acosInstance,
+            Function<File, Mono<UUID>> persistFile
     ) {
         return Mono.zip(
-                        mapPdfFileToFileId(sourceApplicationId, acosInstance),
-                        mapDocumentsToInstanceObjects(sourceApplicationId, acosInstance.getMetadata().getInstanceId(), acosInstance.getDocuments())
+                        mapPdfFileToFileId(persistFile, sourceApplicationId, acosInstance),
+                        mapDocumentsToInstanceObjects(persistFile, sourceApplicationId, acosInstance.getMetadata().getInstanceId(), acosInstance.getDocuments())
                 )
                 .map((Tuple2<UUID, List<InstanceObject>> formPdfFileIdAndDocumentInstanceElement) -> InstanceObject
                         .builder()
@@ -62,8 +57,12 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
         return valuePerKey;
     }
 
-    private Mono<UUID> mapPdfFileToFileId(Long sourceApplicationId, AcosInstance acosInstance) {
-        return fileClient.postFile(
+    private Mono<UUID> mapPdfFileToFileId(
+            Function<File, Mono<UUID>> persistFile,
+            Long sourceApplicationId,
+            AcosInstance acosInstance
+    ) {
+        return persistFile.apply(
                 File
                         .builder()
                         .name("skjemaPdf")
@@ -77,22 +76,29 @@ public class AcosInstanceMapper implements InstanceMapper<AcosInstance> {
     }
 
     private Mono<List<InstanceObject>> mapDocumentsToInstanceObjects(
+            Function<File, Mono<UUID>> persistFile,
             Long sourceApplicationId,
             String sourceApplicationInstanceId,
             Collection<AcosDocument> acosDocuments
     ) {
         return Flux.fromIterable(acosDocuments)
-                .flatMap(acosDocument -> mapDocumentToInstanceObject(sourceApplicationId, sourceApplicationInstanceId, acosDocument))
+                .flatMap(acosDocument -> mapDocumentToInstanceObject(
+                        persistFile,
+                        sourceApplicationId,
+                        sourceApplicationInstanceId,
+                        acosDocument
+                ))
                 .collectList();
     }
 
     private Mono<InstanceObject> mapDocumentToInstanceObject(
+            Function<File, Mono<UUID>> persistFile,
             Long sourceApplicationId,
             String sourceApplicationInstanceId,
             AcosDocument acosDocument
     ) {
         File file = toFile(sourceApplicationId, sourceApplicationInstanceId, acosDocument);
-        return fileClient.postFile(file)
+        return persistFile.apply(file)
                 .map(fileId -> toInstanceObject(acosDocument, fileId));
     }
 
