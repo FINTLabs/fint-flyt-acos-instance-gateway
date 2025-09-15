@@ -31,6 +31,7 @@ public class AcosInstance {
     @ValidBase64
     private String formPdfBase64;
 
+    @Builder.Default
     @Valid
     private List<@NotNull AcosDocument> documents = new ArrayList<>();
 }
