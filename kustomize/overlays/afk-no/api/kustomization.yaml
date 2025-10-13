@@ -26,7 +26,10 @@ patches:
         value: "/afk-no/api/acos/instances"
       - op: replace
         path: "/spec/probes/readiness/path"
-        value: "/afk-no/actuator/health"
+        value: "/afk-no/actuator/health" 
+      - op: replace
+        path: "/spec/observability/metrics/path"
+        value: "/afk-no/actuator/prometheus"
 
     target:
       kind: Application
