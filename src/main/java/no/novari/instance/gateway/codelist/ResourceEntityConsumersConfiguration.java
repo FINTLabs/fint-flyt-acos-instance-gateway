@@ -60,7 +60,7 @@ public class ResourceEntityConsumersConfiguration {
         ).createContainer(EntityTopicNameParameters
                 .builder()
                 .topicNamePrefixParameters(TopicNamePrefixParameters
-                        .builder()
+                        .stepBuilder()
                         .orgIdApplicationDefault()
                         .domainContextApplicationDefault()
                         .build()

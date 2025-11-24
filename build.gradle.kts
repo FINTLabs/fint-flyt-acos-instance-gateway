@@ -41,14 +41,14 @@ dependencies {
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
 
-    implementation("no.fint:fint-model-resource:0.4.1")
+    implementation("no.fintlabs:fint-model-resource:0.5.0")
     implementation("no.fint:fint-arkiv-resource-model-java:$apiVersion")
     implementation("no.fint:fint-administrasjon-resource-model-java:$apiVersion")
 
-    implementation("no.novari:flyt-resource-server:6.0.0-rc-23")
-    implementation("no.novari:kafka:5.0.0-rc-18")
+    implementation("no.novari:flyt-resource-server:6.0.0-rc-26")
+    implementation("no.novari:kafka:5.0.0-rc-20")
     implementation("no.novari:flyt-cache:2.0.0-rc-2")
-    implementation("no.novari:flyt-instance-gateway:7.0.0-rc-6")
+    implementation("no.novari:flyt-instance-gateway:7.0.0-rc-8")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
