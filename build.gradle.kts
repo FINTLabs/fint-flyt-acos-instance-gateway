@@ -46,8 +46,6 @@ dependencies {
     implementation("no.fint:fint-administrasjon-resource-model-java:$apiVersion")
 
     implementation("no.novari:flyt-resource-server:6.0.0")
-    implementation("no.novari:kafka:5.0.0")
-    implementation("no.novari:flyt-cache:2.0.1")
     implementation("no.novari:flyt-instance-gateway:7.0.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
