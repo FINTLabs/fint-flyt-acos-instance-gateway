@@ -34,7 +34,7 @@ patches:
         path: "/spec/env/-"
         value:
           name: novari.kafka.topic.org-id
-          value: "afk-no"
+          value: "bfk-no"
 
     target:
       kind: Application
