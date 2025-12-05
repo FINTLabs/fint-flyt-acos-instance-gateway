@@ -6,8 +6,8 @@ plugins {
 }
 
 group = "no.novari"
-
-val apiVersion: String by project
+version = "0.0.1-SNAPSHOT"
+var apiVersion = "3.21.10"
 
 java {
     toolchain {
@@ -45,10 +45,10 @@ dependencies {
     implementation("no.fint:fint-arkiv-resource-model-java:$apiVersion")
     implementation("no.fint:fint-administrasjon-resource-model-java:$apiVersion")
 
-    implementation("no.novari:flyt-resource-server:6.0.0-rc-26")
-    implementation("no.novari:kafka:5.0.0-rc-20")
-    implementation("no.novari:flyt-cache:2.0.0-rc-2")
-    implementation("no.novari:flyt-instance-gateway:7.0.0-rc-8")
+    implementation("no.novari:flyt-resource-server:6.0.0")
+    implementation("no.novari:kafka:5.0.0")
+    implementation("no.novari:flyt-cache:2.0.1")
+    implementation("no.novari:flyt-instance-gateway:7.0.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
