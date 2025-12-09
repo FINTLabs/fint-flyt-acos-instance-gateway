@@ -30,8 +30,6 @@ spec:
   env:
     - name: JAVA_TOOL_OPTIONS
       value: '-XX:+ExitOnOutOfMemoryError -Xmx700M'
-    - name: novari.flyt.resource-server.security.api.external.authorized-source-application-ids
-      value: "1"
   envFrom:
     - secretRef:
         name: fint-flyt-file-oauth2-client
