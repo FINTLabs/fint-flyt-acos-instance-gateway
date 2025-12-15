@@ -1,22 +1,27 @@
 fint:
   application-id: fint-flyt-acos-instance-gateway
-  cache:
-    defaultCacheEntryTimeToLiveMillis: 518400000
-    defaultCacheHeapSize: 1000000
+
 logging:
   level:
-    no.fintlabs.cache.ehcache.FintEhCacheEventLogger: WARN
+    no.novari.cache.ehcache.FintEhCacheEventLogger: WARN
     reactor.netty.http.client: debug
+
 server:
-  max-http-header-size: 40KB
   error:
     include-message: always
+  max-http-request-header-size: 40KB
+
 spring:
-  codec:
-    max-in-memory-size: 100MB
   profiles:
     include:
       - flyt-kafka
       - flyt-logging
       - flyt-resource-server
       - flyt-file-client
+  output:
+    ansi:
+      enabled: always
+
+  http:
+    codecs:
+      max-in-memory-size: 100MB
