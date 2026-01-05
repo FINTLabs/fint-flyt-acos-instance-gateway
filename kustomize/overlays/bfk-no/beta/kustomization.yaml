@@ -25,8 +25,14 @@ patches:
         path: "/spec/ingress/basePath"
         value: "/beta/bfk-no/api/acos/instances"
       - op: replace
-        path: "/spec/probes/readiness/path"
+        path: "/spec/probes/startup/path"
         value: "/beta/bfk-no/actuator/health"
+      - op: replace
+        path: "/spec/probes/readiness/path"
+        value: "/beta/bfk-no/actuator/health/readiness"
+      - op: replace
+        path: "/spec/probes/liveness/path"
+        value: "/beta/bfk-no/actuator/health/liveness"
       - op: replace
         path: "/spec/observability/metrics/path"
         value: "/beta/bfk-no/actuator/prometheus"
